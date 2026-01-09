@@ -1,0 +1,390 @@
+import React, { useMemo, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Trash2, Plus, Copy, Download, ArrowUpDown } from "lucide-react";
+import { motion } from "framer-motion";
+
+function round1(x: number) {
+  return Math.round(x * 10) / 10;
+}
+
+function fmtPct(x: number) {
+  if (!Number.isFinite(x)) return "—";
+  return `${round1(x).toFixed(1)}%`;
+}
+
+function toCSV(rows: { name: string; words: number; pct: number }[]) {
+  const header = "Speaker,Words,Percent";
+  const lines = rows.map((r) => {
+    const safeName = `"${String(r.name).replace(/"/g, '""')}"`;
+    return `${safeName},${r.words},${round1(r.pct).toFixed(1)}`;
+  });
+  return [header, ...lines].join("\n");
+}
+
+function downloadText(filename: string, text: string) {
+  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function parseBulk(text: string) {
+  // Accept lines like:
+  // Name: 123
+  // Name,123
+  // Name\t123
+  // Name 123
+  const rows: { name: string; words: number }[] = [];
+  const lines = text
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+
+  for (const line of lines) {
+    let name = "";
+    let numStr = "";
+
+    // Try common separators
+    const colon = line.split(":");
+    if (colon.length >= 2) {
+      name = colon.slice(0, -1).join(":").trim();
+      numStr = colon[colon.length - 1].trim();
+    } else if (line.includes(",")) {
+      const parts = line.split(",");
+      name = parts.slice(0, -1).join(",").trim();
+      numStr = parts[parts.length - 1].trim();
+    } else if (line.includes("\t")) {
+      const parts = line.split("\t");
+      name = parts.slice(0, -1).join("\t").trim();
+      numStr = parts[parts.length - 1].trim();
+    } else {
+      // last token as number
+      const parts = line.split(/\s+/);
+      if (parts.length >= 2) {
+        name = parts.slice(0, -1).join(" ").trim();
+        numStr = parts[parts.length - 1].trim();
+      }
+    }
+
+    const words = Number(numStr);
+    if (name && Number.isFinite(words)) {
+      rows.push({ name, words: Math.max(0, Math.floor(words)) });
+    }
+  }
+
+  return rows;
+}
+
+export default function SpeakerPercentageCalculator() {
+  const [rows, setRows] = useState<{ id: string; name: string; words: string }[]>([
+    { id: crypto.randomUUID(), name: "", words: "" },
+  ]);
+  const [bulk, setBulk] = useState<string>("");
+  const [sortMode, setSortMode] = useState<"none" | "name" | "words">("none");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+
+  const computed = useMemo(() => {
+    const normalized = rows
+      .map((r) => ({
+        id: r.id,
+        name: r.name.trim(),
+        words: Number(r.words),
+      }))
+      .filter((r) => r.name.length > 0 || (r.words && Number.isFinite(r.words)));
+
+    const cleaned = normalized
+      .filter((r) => r.name.length > 0)
+      .map((r) => ({
+        id: r.id,
+        name: r.name,
+        words: Number.isFinite(r.words) ? Math.max(0, Math.floor(r.words)) : 0,
+      }));
+
+    const total = cleaned.reduce((acc, r) => acc + r.words, 0);
+    const withPct = cleaned.map((r) => ({
+      ...r,
+      pct: total > 0 ? (r.words / total) * 100 : 0,
+    }));
+
+    let sorted = [...withPct];
+    if (sortMode !== "none") {
+      sorted.sort((a, b) => {
+        const mult = sortDir === "asc" ? 1 : -1;
+        if (sortMode === "name") {
+          return a.name.localeCompare(b.name) * mult;
+        }
+        return (a.words - b.words) * mult;
+      });
+    }
+
+    const pctSum = sorted.reduce((acc, r) => acc + r.pct, 0);
+    return { total, rows: sorted, pctSum };
+  }, [rows, sortMode, sortDir]);
+
+  function updateRow(id: string, patch: Partial<{ name: string; words: string }>) {
+    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+  }
+
+  function addRow() {
+    setRows((prev) => [...prev, { id: crypto.randomUUID(), name: "", words: "" }]);
+  }
+
+  function removeRow(id: string) {
+    setRows((prev) => {
+      const next = prev.filter((r) => r.id !== id);
+      return next.length ? next : [{ id: crypto.randomUUID(), name: "", words: "" }];
+    });
+  }
+
+  function clearAll() {
+    setRows([{ id: crypto.randomUUID(), name: "", words: "" }]);
+    setBulk("");
+    setSortMode("none");
+    setSortDir("desc");
+  }
+
+  function applyBulk() {
+    const parsed = parseBulk(bulk);
+    if (!parsed.length) return;
+    setRows(
+      parsed.map((p) => ({
+        id: crypto.randomUUID(),
+        name: p.name,
+        words: String(p.words),
+      }))
+    );
+  }
+
+  function toggleSort(mode: "name" | "words") {
+    setSortMode((prev) => {
+      if (prev !== mode) {
+        setSortDir(mode === "words" ? "desc" : "asc");
+        return mode;
+      }
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+      return mode;
+    });
+  }
+
+  const exportRows = computed.rows.map((r) => ({
+    name: r.name,
+    words: r.words,
+    pct: r.pct,
+  }));
+
+  return (
+    <div className="min-h-screen w-full bg-gradient-to-b from-white to-slate-50 p-4 md:p-8">
+      <div className="mx-auto max-w-4xl space-y-4">
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Speaker Percentage Calculator</h1>
+          <p className="text-sm md:text-base text-slate-600 mt-1">
+            Enter each speaker and their word count. The app calculates totals and speaking percentages (rounded to 0.1%).
+          </p>
+        </motion.div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card className="rounded-2xl shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg">Quick paste (optional)</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-slate-600">
+                Paste one per line, like <span className="font-mono">Thomas: 179</span> or <span className="font-mono">Thomas,179</span>.
+              </p>
+              <textarea
+                value={bulk}
+                onChange={(e) => setBulk(e.target.value)}
+                className="w-full min-h-[120px] rounded-xl border border-slate-200 bg-white p-3 text-sm outline-none focus:ring-2 focus:ring-slate-200"
+                placeholder={`Thomas: 179\nAnand: 221\nAailya: 143`}
+              />
+              <div className="flex flex-wrap gap-2">
+                <Button onClick={applyBulk} className="rounded-xl">
+                  Apply paste
+                </Button>
+                <Button variant="secondary" onClick={() => setBulk("")} className="rounded-xl">
+                  Clear paste
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-2xl shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg">Summary</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-end justify-between">
+                <div>
+                  <div className="text-sm text-slate-500">Total words</div>
+                  <div className="text-3xl font-semibold tabular-nums">{computed.total}</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm text-slate-500">Percent sum</div>
+                  <div className="text-lg font-medium tabular-nums">{round1(computed.pctSum).toFixed(1)}%</div>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="secondary"
+                  className="rounded-xl"
+                  onClick={() => {
+                    const csv = toCSV(exportRows);
+                    navigator.clipboard?.writeText(csv);
+                  }}
+                >
+                  <Copy className="mr-2 h-4 w-4" /> Copy CSV
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="rounded-xl"
+                  onClick={() => downloadText("speaker_percentages.csv", toCSV(exportRows))}
+                >
+                  <Download className="mr-2 h-4 w-4" /> Download CSV
+                </Button>
+                <Button variant="ghost" className="rounded-xl" onClick={clearAll}>
+                  Reset
+                </Button>
+              </div>
+              <p className="text-xs text-slate-500">
+                Note: Word counts are treated as integers; blanks are treated as 0.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="rounded-2xl shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between gap-3">
+            <CardTitle className="text-lg">Speakers</CardTitle>
+            <div className="flex gap-2">
+              <Button variant="secondary" className="rounded-xl" onClick={() => toggleSort("name")}
+                title="Sort by name">
+                <ArrowUpDown className="mr-2 h-4 w-4" /> Name
+              </Button>
+              <Button variant="secondary" className="rounded-xl" onClick={() => toggleSort("words")}
+                title="Sort by word count">
+                <ArrowUpDown className="mr-2 h-4 w-4" /> Words
+              </Button>
+              <Button className="rounded-xl" onClick={addRow}>
+                <Plus className="mr-2 h-4 w-4" /> Add
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-12 gap-2 px-1 pb-2 text-xs font-medium text-slate-500">
+              <div className="col-span-5">Speaker</div>
+              <div className="col-span-3">Words</div>
+              <div className="col-span-3">Percent</div>
+              <div className="col-span-1" />
+            </div>
+
+            <div className="space-y-2">
+              {rows.map((r) => {
+                const found = computed.rows.find((x) => x.id === r.id);
+                const pct = found ? found.pct : NaN;
+                return (
+                  <motion.div
+                    key={r.id}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="grid grid-cols-12 gap-2 items-center"
+                  >
+                    <div className="col-span-5">
+                      <Label className="sr-only">Speaker</Label>
+                      <Input
+                        value={r.name}
+                        onChange={(e) => updateRow(r.id, { name: e.target.value })}
+                        placeholder="e.g., Thomas"
+                        className="rounded-xl"
+                      />
+                    </div>
+                    <div className="col-span-3">
+                      <Label className="sr-only">Words</Label>
+                      <Input
+                        value={r.words}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          // allow empty, or digits
+                          if (v === "" || /^\d+$/.test(v)) updateRow(r.id, { words: v });
+                        }}
+                        placeholder="0"
+                        inputMode="numeric"
+                        className="rounded-xl tabular-nums"
+                      />
+                    </div>
+                    <div className="col-span-3 text-sm tabular-nums text-slate-700">
+                      {fmtPct(pct)}
+                    </div>
+                    <div className="col-span-1 flex justify-end">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="rounded-xl"
+                        onClick={() => removeRow(r.id)}
+                        title="Remove"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            <div className="mt-5 border-t pt-4">
+              <h3 className="text-sm font-medium text-slate-700 mb-2">Preview table</h3>
+              <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-50">
+                    <tr>
+                      <th className="text-left px-3 py-2 font-medium text-slate-600">Speaker</th>
+                      <th className="text-right px-3 py-2 font-medium text-slate-600">Words</th>
+                      <th className="text-right px-3 py-2 font-medium text-slate-600">Percent</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {computed.rows.length === 0 ? (
+                      <tr>
+                        <td className="px-3 py-3 text-slate-500" colSpan={3}>
+                          Add speakers above to see results.
+                        </td>
+                      </tr>
+                    ) : (
+                      computed.rows.map((r) => (
+                        <tr key={r.id} className="border-t">
+                          <td className="px-3 py-2">{r.name}</td>
+                          <td className="px-3 py-2 text-right tabular-nums">{r.words}</td>
+                          <td className="px-3 py-2 text-right tabular-nums">{fmtPct(r.pct)}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                  {computed.rows.length > 0 && (
+                    <tfoot className="bg-slate-50 border-t">
+                      <tr>
+                        <td className="px-3 py-2 font-medium">Total</td>
+                        <td className="px-3 py-2 text-right font-medium tabular-nums">{computed.total}</td>
+                        <td className="px-3 py-2 text-right font-medium tabular-nums">{round1(computed.pctSum).toFixed(1)}%</td>
+                      </tr>
+                    </tfoot>
+                  )}
+                </table>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="text-xs text-slate-500">
+          Tips: Use the paste box for quick entry, then export to CSV for your slide notes or practice tracking.
+        </div>
+      </div>
+    </div>
+  );
+}

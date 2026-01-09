@@ -5,176 +5,154 @@
   <title>Speaker Percentage Calculator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- React -->
+  <!-- React (UMD) -->
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+
+  <!-- Babel (lets the browser run JSX) -->
   <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f8d3af;
-      margin: 0;
-      padding: 0;
+    body { font-family: Arial, sans-serif; background:#f6f7fb; margin:0; }
+    .container { max-width: 900px; margin: 0 auto; padding: 24px; }
+    h1 { margin: 0 0 6px; }
+    .sub { margin: 0 0 18px; color:#444; }
+    .card { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:16px; margin-top:14px; }
+    .row { display:flex; gap:10px; flex-wrap:wrap; }
+    input, textarea, select {
+      font-size:16px; padding:10px 12px; border:1px solid #d1d5db; border-radius:10px; outline:none;
     }
-
-    .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-    }
-
-    .input-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-
-    input {
-      padding: 8px;
-      font-size: 16px;
-      flex: 1;
-    }
-
+    input:focus, textarea:focus, select:focus { border-color:#7c3aed; }
+    input { flex: 1; min-width: 180px; }
+    textarea { width:100%; min-height:110px; }
     button {
-      padding: 8px 12px;
-      font-size: 16px;
-      cursor: pointer;
-      border: none;
-      background: #444;
-      color: white;
-      border-radius: 4px;
+      font-size:16px; padding:10px 12px; border:none; border-radius:10px; cursor:pointer;
+      background:#111827; color:white;
     }
-
-    button:hover {
-      background: #222;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background: white;
-    }
-
-    th, td {
-      padding: 10px;
-      border: 1px solid #ccc;
-      text-align: center;
-    }
-
-    th {
-      background: #eee;
-    }
-
-    .delete-btn {
-      background: #c0392b;
-    }
-
-    .delete-btn:hover {
-      background: #962d22;
-    }
-
-    .total {
-      font-weight: bold;
-      background: #fafafa;
-    }
+    button:hover { background:#000; }
+    .btn2 { background:#6b7280; }
+    .btn2:hover { background:#4b5563; }
+    .danger { background:#b91c1c; }
+    .danger:hover { background:#7f1d1d; }
+    table { width:100%; border-collapse:collapse; margin-top:12px; }
+    th, td { border-bottom:1px solid #e5e7eb; padding:10px; text-align:left; }
+    th { color:#111827; }
+    td.num, th.num { text-align:right; }
+    .small { font-size: 13px; color:#555; margin-top:6px; }
+    .totalRow td { font-weight:bold; }
   </style>
 </head>
-
 <body>
   <div id="root"></div>
 
   <script type="text/babel">
+    const round1 = (x) => Math.round(x * 10) / 10;
+
     function App() {
       const [name, setName] = React.useState("");
       const [words, setWords] = React.useState("");
-      const [speakers, setSpeakers] = React.useState([]);
+      const [rows, setRows] = React.useState([]);
 
-      const totalWords = speakers.reduce((sum, s) => sum + s.words, 0);
+      const total = React.useMemo(
+        () => rows.reduce((s, r) => s + r.words, 0),
+        [rows]
+      );
 
-      const addSpeaker = () => {
-        if (!name || !words) return;
-
-        setSpeakers([
-          ...speakers,
-          { id: Date.now(), name, words: Number(words) }
-        ]);
-
+      const addRow = () => {
+        const n = name.trim();
+        const w = Number(words);
+        if (!n || !Number.isFinite(w) || w < 0) return;
+        setRows(prev => [...prev, { id: crypto.randomUUID(), name: n, words: Math.floor(w) }]);
         setName("");
         setWords("");
       };
 
-      const removeSpeaker = (id) => {
-        setSpeakers(speakers.filter(s => s.id !== id));
+      const removeRow = (id) => setRows(prev => prev.filter(r => r.id !== id));
+      const clearAll = () => setRows([]);
+
+      const exportCSV = () => {
+        const lines = ["Speaker,Words,Percent"];
+        rows.forEach(r => {
+          const pct = total > 0 ? round1((r.words / total) * 100).toFixed(1) : "0.0";
+          const safe = `"${r.name.replace(/"/g,'""')}"`;
+          lines.push(`${safe},${r.words},${pct}`);
+        });
+        const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "speaker_percentages.csv";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
       };
 
       return (
         <div className="container">
           <h1>Speaker Percentage Calculator</h1>
+          <p className="sub">Enter each speaker and their word count. Percentages are rounded to 0.1%.</p>
 
-          <div className="input-row">
-            <input
-              placeholder="Speaker Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-            <input
-              type="number"
-              placeholder="Word Count"
-              value={words}
-              onChange={(e) => setWords(e.target.value)}
-            />
-            <button onClick={addSpeaker}>Add</button>
-          </div>
+          <div className="card">
+            <div className="row">
+              <input
+                placeholder="Speaker name (e.g., Thomas)"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              <input
+                type="number"
+                placeholder="Word count (e.g., 179)"
+                value={words}
+                onChange={(e) => setWords(e.target.value)}
+              />
+              <button onClick={addRow}>Add</button>
+            </div>
 
-          <table>
-            <thead>
-              <tr>
-                <th>Speaker</th>
-                <th>Words</th>
-                <th>Percent</th>
-                <th>Remove</th>
-              </tr>
-            </thead>
-            <tbody>
-              {speakers.map(s => (
-                <tr key={s.id}>
-                  <td>{s.name}</td>
-                  <td>{s.words}</td>
-                  <td>
-                    {totalWords > 0
-                      ? ((s.words / totalWords) * 100).toFixed(1) + "%"
-                      : "0.0%"}
-                  </td>
-                  <td>
-                    <button
-                      className="delete-btn"
-                      onClick={() => removeSpeaker(s.id)}
-                    >
-                      ✕
-                    </button>
-                  </td>
+            <div className="row" style={{ marginTop: 10 }}>
+              <button className="btn2" onClick={exportCSV} disabled={rows.length === 0}>Export CSV</button>
+              <button className="danger" onClick={clearAll} disabled={rows.length === 0}>Clear All</button>
+            </div>
+
+            <div className="small">Total words: <b>{total}</b></div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Speaker</th>
+                  <th className="num">Words</th>
+                  <th className="num">Percent</th>
+                  <th className="num">Remove</th>
                 </tr>
-              ))}
-              <tr className="total">
-                <td>Total</td>
-                <td>{totalWords}</td>
-                <td>100.0%</td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {rows.map(r => {
+                  const pct = total > 0 ? round1((r.words / total) * 100).toFixed(1) : "0.0";
+                  return (
+                    <tr key={r.id}>
+                      <td>{r.name}</td>
+                      <td className="num">{r.words}</td>
+                      <td className="num">{pct}%</td>
+                      <td className="num">
+                        <button className="danger" onClick={() => removeRow(r.id)}>✕</button>
+                      </td>
+                    </tr>
+                  );
+                })}
+                <tr className="totalRow">
+                  <td>Total</td>
+                  <td className="num">{total}</td>
+                  <td className="num">{rows.length ? "100.0%" : "0.0%"}</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       );
     }
 
-    const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(<App />);
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
   </script>
 </body>
 </html>

@@ -67,7 +67,8 @@
         </div>
 
         <div class="footer">
-          Notes: lines starting with <code>[</code> or <code>(</code> are ignored as stage directions. If someone speaks across multiple lines, lines <em>without</em> <code>Name:</code> are treated as continuation of the previous speaker.
+          Notes: lines starting with <code>[</code> or <code>(</code> are ignored as stage directions. Lines that start with <code>Slide</code> are ignored.
+          If someone speaks across multiple lines, lines <em>without</em> <code>Name:</code> are treated as continuation of the previous speaker.
         </div>
       </div>
 
@@ -141,7 +142,7 @@
     </div>
 
     <div class="footer" style="margin-top:18px">
-      If your GitHub Pages page shows raw code: make sure this file is named <code>index.html</code> in your repository root (or in the configured Pages folder), not <code>.js</code>.
+      If your GitHub Pages page shows raw code: make sure this file is named <code>index.html</code> in your repository root (or in the configured Pages folder).
     </div>
   </div>
 
@@ -156,19 +157,16 @@
     }
 
     function countWords(text) {
-      // Count sequences of letters/numbers with apostrophes allowed: "don't" = 1
       const m = (text || "").match(/[A-Za-z0-9]+(?:'[A-Za-z0-9]+)*/g);
       return m ? m.length : 0;
     }
 
     function hashColor(str) {
-      // Deterministic nice-ish colors, no external libs
       let h = 2166136261;
       for (let i = 0; i < str.length; i++) {
         h ^= str.charCodeAt(i);
         h = Math.imul(h, 16777619);
       }
-      // map to HSL
       const hue = Math.abs(h) % 360;
       return `hsl(${hue} 70% 60%)`;
     }
@@ -184,27 +182,55 @@
       let current = null;
       let ignored = 0;
 
+      // Name must start with a capital letter and end with a colon
       const nameLineRe = /^\s*([A-Z][A-Za-z0-9_\- ]{0,40}?)\s*:\s*(.*)\s*$/;
+
+      // Ignore any line that starts with "Slide" (case-insensitive)
+      const slideLineRe = /^\s*slide\b/i;
 
       for (const raw of lines) {
         const line = raw.trimEnd();
-        if (line.trim().length === 0) continue;
+        const trimmed = line.trim();
+        if (trimmed.length === 0) continue;
 
+        // Ignore slide headings like "Slide 8:" or "Slide 10 - ..."
+        if (slideLineRe.test(trimmed)) {
+          ignored++;
+          continue;
+        }
+
+        // Ignore stage directions like [High five] or (points to...)
         if (opts.ignoreBrackets) {
-          const t = line.trim();
-          if (t.startsWith('[') || t.startsWith('(')) { ignored++; continue; }
+          if (trimmed.startsWith('[') || trimmed.startsWith('(')) {
+            ignored++;
+            continue;
+          }
         }
 
         const m = line.match(nameLineRe);
         if (m) {
-          const nm = normalizeName(m[1], opts.caseSensitive);
+          const nmRaw = m[1] || "";
+          const nm = normalizeName(nmRaw, opts.caseSensitive);
+
+          // Safety: if a "speaker name" contains the word "slide", ignore it
+          if (/\bslide\b/i.test(nm)) {
+            ignored++;
+            current = null;
+            continue;
+          }
+
           const txt = (m[2] || "").trim();
           current = { name: nm, text: txt };
           blocks.push(current);
         } else {
           // Continuation line: attribute to the last speaker if any; otherwise ignore
           if (current) {
-            current.text = (current.text ? current.text + " " : "") + line.trim();
+            // Also ignore slide headings that appear as continuation lines
+            if (slideLineRe.test(trimmed)) {
+              ignored++;
+              continue;
+            }
+            current.text = (current.text ? current.text + " " : "") + trimmed;
           } else {
             ignored++;
           }
@@ -213,17 +239,9 @@
 
       // Convert blocks -> aggregated speaker word counts
       const bySpeaker = new Map();
-      if (opts.mergeSame) {
-        for (const b of blocks) {
-          const w = countWords(b.text);
-          bySpeaker.set(b.name, (bySpeaker.get(b.name) || 0) + w);
-        }
-      } else {
-        // If not merging, still aggregate for charts/table (table is per-speaker)
-        for (const b of blocks) {
-          const w = countWords(b.text);
-          bySpeaker.set(b.name, (bySpeaker.get(b.name) || 0) + w);
-        }
+      for (const b of blocks) {
+        const w = countWords(b.text);
+        bySpeaker.set(b.name, (bySpeaker.get(b.name) || 0) + w);
       }
 
       // Build rows
@@ -237,7 +255,7 @@
         pct: total > 0 ? round1((r.words / total) * 100) : 0
       }));
 
-      // Fix rounding drift for display (optional): adjust the largest slice so sum=100.0 when total>0
+      // Fix rounding drift (optional): adjust the largest slice so sum=100.0 when total>0
       if (total > 0) {
         const sum = withPct.reduce((a, r) => a + r.pct, 0);
         const drift = round1(100 - sum);
@@ -278,6 +296,7 @@
 
       for (const r of rows) {
         const tr = document.createElement('tr');
+
         const tdName = document.createElement('td');
         tdName.className = 'nameCell';
         tdName.textContent = r.name;
@@ -320,7 +339,6 @@
 
     function clearCanvas(ctx, canvas) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      // background fill
       ctx.fillStyle = '#0b1020';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
@@ -337,7 +355,6 @@
       const total = rows.reduce((a, r) => a + r.words, 0);
       let start = -Math.PI / 2;
 
-      // If empty
       if (total <= 0) {
         ctx.fillStyle = 'rgba(255,255,255,.15)';
         ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
@@ -359,12 +376,10 @@
         start = end;
       }
 
-      // donut hole
       ctx.globalCompositeOperation = 'destination-out';
       ctx.beginPath(); ctx.arc(cx, cy, r * 0.55, 0, Math.PI * 2); ctx.fill();
       ctx.globalCompositeOperation = 'source-over';
 
-      // center text
       ctx.fillStyle = 'rgba(230,232,239,.9)';
       ctx.font = '600 16px system-ui';
       ctx.textAlign = 'center';
@@ -383,10 +398,9 @@
       const w = c.width - padL - padR;
       const h = c.height - padT - padB;
 
-      const top = rows.slice(0, 12); // keep readable
+      const top = rows.slice(0, 12);
       const max = Math.max(1, ...top.map(r => r.words));
 
-      // axes
       ctx.strokeStyle = 'rgba(255,255,255,.12)';
       ctx.beginPath();
       ctx.moveTo(padL, padT);
@@ -409,19 +423,16 @@
         ctx.fillStyle = hashColor(r0.name);
         ctx.fillRect(x, y, barW, bh);
 
-        // word label
         ctx.fillStyle = 'rgba(230,232,239,.9)';
         ctx.textAlign = 'center';
         ctx.fillText(String(r0.words), x + barW / 2, y - 4);
 
-        // name label (trim)
         const label = r0.name.length > 10 ? r0.name.slice(0, 9) + '…' : r0.name;
         ctx.fillStyle = 'rgba(255,255,255,.7)';
         ctx.fillText(label, x + barW / 2, padT + h + 16);
       }
       ctx.textAlign = 'left';
 
-      // note if many
       if (rows.length > top.length) {
         ctx.fillStyle = 'rgba(255,255,255,.55)';
         ctx.font = '12px system-ui';
@@ -451,11 +462,9 @@
         x += segW;
       }
 
-      // outline
       ctx.strokeStyle = 'rgba(255,255,255,.15)';
       ctx.strokeRect(x0, y0, w, h);
 
-      // 0%, 50%, 100%
       ctx.fillStyle = 'rgba(255,255,255,.65)';
       ctx.font = '12px system-ui';
       ctx.textAlign = 'center';
@@ -507,9 +516,6 @@
       state.rows = rows;
       state.totalWords = totalWords;
       state.ignoredCount = ignoredCount;
-      // keep default sort: words desc
-      state.sortKey = state.sortKey || 'words';
-      state.sortDir = state.sortDir || 'desc';
       renderAll();
     });
 
@@ -545,7 +551,6 @@
         $('copyCsv').textContent = 'Copied!';
         setTimeout(() => $('copyCsv').textContent = 'Copy CSV', 900);
       } catch {
-        // fallback
         const ta = document.createElement('textarea');
         ta.value = csv;
         document.body.appendChild(ta);
@@ -557,7 +562,6 @@
       }
     });
 
-    // Initial draw
     renderAll();
   </script>
 </body>

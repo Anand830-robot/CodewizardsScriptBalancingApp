@@ -5,25 +5,61 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Speaker Percentage Calculator</title>
   <style>
-    :root{--bg:#0b1020;--card:#121a33;--muted:#98a2b3;--text:#e6e8ef;--line:#243053;--accent:#7c9cff;--good:#2dd4bf;--warn:#fbbf24;--bad:#fb7185;}
+    :root{
+      --bg:#0b1020;--card:#121a33;--muted:#98a2b3;--text:#e6e8ef;--line:#243053;
+      --accent:#7c9cff;--good:#2dd4bf;--warn:#fbbf24;--bad:#fb7185;--chip:#0b1020;
+      --chip2:#0f1630;
+    }
     *{box-sizing:border-box}
-    body{margin:0;background:linear-gradient(180deg,#070a14 0%, #0b1020 40%, #070a14 100%);color:var(--text);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#070a14 0%, #0b1020 40%, #070a14 100%);
+      color:var(--text);
+      font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    }
     a{color:var(--accent)}
-    .wrap{max-width:1100px;margin:0 auto;padding:22px;}
+    .wrap{max-width:1180px;margin:0 auto;padding:22px;}
     h1{margin:0 0 6px;font-size:26px;letter-spacing:.2px}
     .sub{color:var(--muted);margin:0 0 18px}
     .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
-    @media (max-width: 900px){.grid{grid-template-columns:1fr}}
-    .card{background:rgba(18,26,51,.92);border:1px solid rgba(36,48,83,.9);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);padding:14px}
+    @media (max-width: 980px){.grid{grid-template-columns:1fr}}
+    .card{
+      background:rgba(18,26,51,.92);
+      border:1px solid rgba(36,48,83,.9);
+      border-radius:16px;
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
+      padding:14px
+    }
     .card h2{margin:0 0 10px;font-size:16px;color:#d7dcff}
-    textarea{width:100%;min-height:210px;resize:vertical;background:#0b1020;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:12px;font:13px/1.4 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;outline:none}
-    textarea:focus,input:focus{border-color:rgba(124,156,255,.9);box-shadow:0 0 0 3px rgba(124,156,255,.18)}
+    textarea{
+      width:100%;
+      min-height:210px;
+      resize:vertical;
+      background:#0b1020;color:var(--text);
+      border:1px solid var(--line);
+      border-radius:12px;padding:12px;
+      font:13px/1.4 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      outline:none
+    }
+    textarea:focus,input:focus,select:focus{
+      border-color:rgba(124,156,255,.9);
+      box-shadow:0 0 0 3px rgba(124,156,255,.18)
+    }
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .btn{appearance:none;border:1px solid var(--line);background:#0b1020;color:var(--text);padding:9px 12px;border-radius:12px;cursor:pointer}
+    .btn{
+      appearance:none;border:1px solid var(--line);
+      background:#0b1020;color:var(--text);
+      padding:9px 12px;border-radius:12px;cursor:pointer
+    }
     .btn:hover{border-color:rgba(124,156,255,.7)}
     .btn.primary{background:rgba(124,156,255,.18);border-color:rgba(124,156,255,.45)}
     .btn.danger{background:rgba(251,113,133,.12);border-color:rgba(251,113,133,.35)}
-    .pill{display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:999px;background:#0b1020;color:var(--muted)}
+    .btn.good{background:rgba(45,212,191,.12);border-color:rgba(45,212,191,.35)}
+    .pill{
+      display:inline-flex;gap:8px;align-items:center;
+      padding:8px 10px;border:1px solid var(--line);
+      border-radius:999px;background:#0b1020;color:var(--muted)
+    }
     .pill b{color:var(--text)}
     .mini{font-size:12px;color:var(--muted)}
     table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:12px}
@@ -34,8 +70,12 @@
     .nameCell{font-weight:600}
     .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
     .controls .left{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    input[type="text"],input[type="number"]{background:#0b1020;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:9px 10px;outline:none}
-    input[type="number"]{width:110px}
+    input[type="text"],input[type="number"],select{
+      background:#0b1020;color:var(--text);
+      border:1px solid var(--line);
+      border-radius:12px;padding:9px 10px;outline:none
+    }
+    input[type="number"]{width:120px}
     .split{display:grid;grid-template-columns:1fr;gap:12px}
     canvas{width:100%;height:auto;background:#0b1020;border:1px solid var(--line);border-radius:12px}
     .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
@@ -43,14 +83,91 @@
     .swatch{width:12px;height:12px;border-radius:3px;border:1px solid rgba(255,255,255,.12)}
     .footer{margin-top:12px;color:var(--muted);font-size:12px}
     code{background:rgba(255,255,255,.06);padding:2px 6px;border-radius:8px}
-    ul{margin:10px 0 0 18px}
-    .tag{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid rgba(36,48,83,.9);background:rgba(124,156,255,.10);color:rgba(230,232,239,.95);font-size:11px;margin-right:8px}
+
+    /* Script Viewer (Feature #8) */
+    .viewerWrap{
+      border:1px solid rgba(36,48,83,.7);
+      border-radius:12px;
+      overflow:hidden;
+      background:#0b1020;
+    }
+    .viewerHead{
+      display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+      padding:10px 12px;
+      border-bottom:1px solid rgba(36,48,83,.7);
+      background:linear-gradient(180deg,rgba(18,26,51,.35),rgba(11,16,32,.2));
+    }
+    .chip{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(36,48,83,.9);
+      background:var(--chip);color:var(--muted);
+      font-size:12px;
+    }
+    .chip b{color:var(--text)}
+    .viewer{
+      padding:10px 12px;
+      font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+    .spLine{display:block;padding:3px 6px;border-radius:10px;margin:2px 0}
+    .spLabel{font-weight:700}
+    .spText{color:rgba(230,232,239,.95)}
+    .spIgnored{opacity:.6}
+    .activeLine{
+      outline:2px solid rgba(124,156,255,.45);
+      background:rgba(124,156,255,.10);
+    }
+    .dimLine{opacity:.35}
+    .tagIgnored{
+      margin-left:10px;
+      font-size:11px;
+      padding:2px 8px;border-radius:999px;
+      border:1px solid rgba(36,48,83,.9);
+      background:rgba(255,255,255,.04);
+      color:rgba(255,255,255,.55);
+    }
+
+    /* Suggestions panel (Feature #4 + upgrade request) */
+    .suggestionList{margin:0;padding-left:18px}
+    .kpiRow{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 2px}
+    .kpi{
+      padding:8px 10px;border-radius:12px;
+      border:1px solid rgba(36,48,83,.9);
+      background:#0b1020;
+      color:var(--muted);
+      font-size:12px;
+      display:inline-flex;gap:8px;align-items:center;
+    }
+    .kpi b{color:var(--text)}
+    .flag{font-weight:700}
+    .flag.good{color:var(--good)}
+    .flag.warn{color:var(--warn)}
+    .flag.bad{color:var(--bad)}
+
+    /* Export outputs (Feature #7) */
+    .outBox{
+      width:100%;
+      min-height:120px;
+      resize:vertical;
+      background:#0b1020;color:var(--text);
+      border:1px solid var(--line);
+      border-radius:12px;padding:10px;
+      font:12.5px/1.45 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      outline:none
+    }
+    .twoCol{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width: 980px){.twoCol{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
   <div class="wrap">
     <h1>Speaker Percentage Calculator</h1>
-    <p class="sub">Paste your script (format: <code>Name:</code> dialogue). The app counts words per speaker and calculates percentages (rounded to 0.1%).</p>
+    <p class="sub">
+      Paste your script (format: <code>Name:</code> dialogue). The app counts words per speaker and calculates percentages (rounded to 0.1%).
+      Click a speaker in the results table to highlight their lines.
+    </p>
 
     <div class="grid">
       <div class="card">
@@ -62,16 +179,16 @@ Allison: Ugh, mapping this cave...
 Aailya: Yeah, this is really hard work."></textarea>
 
         <div class="row" style="margin-top:10px">
-          <button class="btn primary" id="analyzeBtn" type="button">Analyze script</button>
-          <button class="btn" id="clearBtn" type="button">Clear</button>
+          <button class="btn primary" id="analyzeBtn">Analyze script</button>
+          <button class="btn" id="clearBtn">Clear</button>
           <span class="pill"><span>Total words:</span> <b id="totalWords">0</b></span>
           <span class="pill"><span>Speakers:</span> <b id="speakerCount">0</b></span>
           <span class="pill"><span>Ignored lines:</span> <b id="ignoredCount">0</b></span>
         </div>
 
         <div class="footer">
-          Notes: lines starting with <code>[</code> or <code>(</code> are ignored as stage directions. Lines that start with <code>Slide</code> are ignored.
-          If someone speaks across multiple lines, lines <em>without</em> <code>Name:</code> are treated as continuation of the previous speaker.
+          Notes: lines starting with <code>[</code> or <code>(</code> are ignored as stage directions. Any line containing <code>Slide</code> is ignored.
+          Lines without <code>Name:</code> are treated as a continuation of the previous speaker.
         </div>
       </div>
 
@@ -79,52 +196,46 @@ Aailya: Yeah, this is really hard work."></textarea>
         <h2>Options</h2>
         <div class="split">
           <label class="mini"><input type="checkbox" id="ignoreBrackets" checked /> Ignore bracket/parenthesis stage directions</label>
-          <label class="mini"><input type="checkbox" id="mergeSame" checked /> Merge repeated speaker blocks</label>
           <label class="mini"><input type="checkbox" id="caseSensitive" /> Case-sensitive names (normally OFF)</label>
+
+          <div class="row">
+            <label class="mini" style="display:flex;align-items:center;gap:8px">
+              <input type="checkbox" id="groupSmall" checked />
+              Group speakers under
+            </label>
+            <input type="number" id="smallPct" min="0" step="0.1" value="1.0" />
+            <span class="mini">% into “Other”</span>
+          </div>
 
           <div class="controls">
             <div class="left">
               <span class="mini">Sort:</span>
-              <button class="btn" id="sortName" type="button">Name</button>
-              <button class="btn" id="sortWords" type="button">Words</button>
-              <button class="btn" id="sortPct" type="button">Percent</button>
+              <button class="btn" id="sortName">Name</button>
+              <button class="btn" id="sortWords">Words</button>
+              <button class="btn" id="sortPct">Percent</button>
             </div>
             <div class="left">
               <span class="mini">Direction:</span>
-              <button class="btn" id="dirBtn" type="button">Desc</button>
+              <button class="btn" id="dirBtn">Desc</button>
             </div>
           </div>
 
           <div class="row">
-            <button class="btn" id="downloadCsv" type="button">Download CSV</button>
-            <button class="btn" id="copyCsv" type="button">Copy CSV</button>
-            <button class="btn danger" id="resetData" type="button">Reset table</button>
+            <button class="btn" id="downloadCsv">Download CSV</button>
+            <button class="btn" id="copyCsv">Copy CSV</button>
+            <button class="btn" id="downloadJson">Download JSON</button>
+            <button class="btn good" id="downloadPng">Download PNG report</button>
+            <button class="btn danger" id="resetData">Reset</button>
           </div>
 
-          <div class="mini">CSV columns: Speaker, Words, Percent</div>
+          <div class="mini">Exports: CSV (Speaker, Words, Percent), JSON (full analysis), PNG (charts + table + suggestions)</div>
         </div>
       </div>
     </div>
 
     <div class="grid" style="margin-top:16px">
       <div class="card">
-        <h2>Results table</h2>
-
-        <!-- Suggestions box -->
-        <div id="suggestionsBox" style="margin:10px 0 12px; padding:12px; border:1px solid rgba(36,48,83,.7); border-radius:12px; background:#0b1020;">
-          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
-            <div style="font-weight:700; color:#d7dcff;">Suggestions</div>
-            <label class="mini" style="display:flex; align-items:center; gap:8px; margin:0;">
-              <input type="checkbox" id="enableSuggestions" checked />
-              Enable
-            </label>
-          </div>
-          <div class="mini" style="margin-top:6px; color:rgba(255,255,255,.65);">
-            Script improvements: balance, clarity, flow, and “sounds better” tips.
-          </div>
-          <ul id="suggestionsList" style="margin:10px 0 0 18px; padding:0; color:rgba(230,232,239,.92);"></ul>
-        </div>
-
+        <h2>Results table (click a row to highlight)</h2>
         <div style="overflow:auto;border-radius:12px;border:1px solid rgba(36,48,83,.7)">
           <table id="tbl">
             <thead>
@@ -137,7 +248,10 @@ Aailya: Yeah, this is really hard work."></textarea>
             <tbody></tbody>
           </table>
         </div>
-        <div class="mini" style="margin-top:8px">Tip: If a name is misspelled in your script (e.g., Aaliya vs Aailya), it will count as two separate speakers.</div>
+        <div class="mini" style="margin-top:8px">
+          Tip: If a name is misspelled (e.g., Aaliya vs Aailya), it will count separately unless you standardize names in your script.
+          If you click “Other”, it will highlight all speakers that were grouped.
+        </div>
       </div>
 
       <div class="card">
@@ -160,35 +274,92 @@ Aailya: Yeah, this is really hard work."></textarea>
       </div>
     </div>
 
+    <div class="grid" style="margin-top:16px">
+      <div class="card">
+        <h2>Script viewer (highlight + ignored lines)</h2>
+        <div class="viewerWrap">
+          <div class="viewerHead">
+            <span class="chip">Highlight: <b id="activeSpeakerLabel">None</b></span>
+            <button class="btn" id="clearHighlight">Clear highlight</button>
+            <span class="chip">Click a speaker row (or a line) to highlight</span>
+          </div>
+          <div id="viewer" class="viewer" aria-label="Script viewer"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Readability & pacing suggestions</h2>
+        <div class="kpiRow" id="kpis"></div>
+        <ul class="suggestionList" id="suggestions"></ul>
+
+        <div class="twoCol" style="margin-top:12px">
+          <div>
+            <div class="mini" style="margin:0 0 6px">Judge-friendly summary (copy/paste)</div>
+            <textarea class="outBox" id="summaryBox" readonly></textarea>
+            <div class="row" style="margin-top:8px">
+              <button class="btn" id="copySummary">Copy summary</button>
+            </div>
+          </div>
+          <div>
+            <div class="mini" style="margin:0 0 6px">Notes</div>
+            <div class="mini">
+              These suggestions are based on your *spoken lines only* (stage directions and slide headings are ignored).
+              If your script is very short, some metrics may be less meaningful.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="footer" style="margin-top:18px">
-      If your GitHub Pages page shows raw code: make sure this file is named <code>index.html</code> in your repository root (or in the configured Pages folder).
+      GitHub Pages reminder: this file should be named <code>index.html</code> in your repo root (or the configured Pages folder).
+      If the Analyze button stops working: make sure you didn’t accidentally remove the <code>&lt;script&gt;</code> section or break quotes/brackets.
     </div>
   </div>
 
   <script>
+    // ==========================================================
+    // Speaker Percentage Calculator
+    // Features added:
+    // (4) Readability & pacing checks + suggestions
+    // (7) Better exports: PNG report, JSON download, summary copy
+    // (8) Script viewer with click-to-highlight by speaker
+    // ==========================================================
+
     // ---------- Helpers ----------
     const $ = (id) => document.getElementById(id);
+
+    function escapeHTML(s) {
+      return String(s)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#39;");
+    }
 
     function normalizeName(name, caseSensitive) {
       const n = (name || "").trim();
       if (!n) return "";
       if (caseSensitive) return n;
+      // Capitalize first char, keep rest as-is (so "McDonald" stays "McDonald" if already correct)
       return n[0].toUpperCase() + n.slice(1);
     }
 
     function countWords(text) {
+      // "don't" counts as 1
       const m = (text || "").match(/[A-Za-z0-9]+(?:'[A-Za-z0-9]+)*/g);
       return m ? m.length : 0;
     }
 
-    function splitSentences(text) {
-      // Simple sentence split (good enough for suggestions)
-      const t = (text || "").replace(/\s+/g, ' ').trim();
-      if (!t) return [];
-      return t.split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean);
+    function tokenizeWords(text) {
+      return (text || "").match(/[A-Za-z0-9]+(?:'[A-Za-z0-9]+)*/g) || [];
     }
 
+    function round1(x) { return Math.round(x * 10) / 10; }
+
     function hashColor(str) {
+      // deterministic, pleasant-ish HSL
       let h = 2166136261;
       for (let i = 0; i < str.length; i++) {
         h ^= str.charCodeAt(i);
@@ -198,360 +369,338 @@ Aailya: Yeah, this is really hard work."></textarea>
       return `hsl(${hue} 70% 60%)`;
     }
 
-    function round1(x) { return Math.round(x * 10) / 10; }
-
-    function clipWords(text, n=12) {
-      const words = (text || "").trim().split(/\s+/).filter(Boolean);
-      if (words.length <= n) return words.join(' ');
-      return words.slice(0, n).join(' ') + '…';
+    function downloadBlob(filename, blob) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
     }
 
-    // ---------- Feature: merge tiny speakers into "Other" (< 1%) ----------
-    function mergeTinyToOther(rows, totalWords, thresholdPct = 1.0) {
-      if (!rows || rows.length === 0 || totalWords <= 0) return rows;
+    function downloadText(filename, text, mime = 'text/plain;charset=utf-8') {
+      downloadBlob(filename, new Blob([text], { type: mime }));
+    }
 
-      const kept = [];
-      let otherWords = 0;
-
-      for (const r of rows) {
-        const pct = (r.words / totalWords) * 100;
-        if (pct < thresholdPct) otherWords += r.words;
-        else kept.push({ ...r });
-      }
-
-      if (otherWords > 0) kept.push({ name: 'Other', words: otherWords, pct: 0 });
-
-      const updatedTotal = kept.reduce((a, r) => a + r.words, 0);
-      const withPct = kept.map(r => ({
-        ...r,
-        pct: updatedTotal > 0 ? round1((r.words / updatedTotal) * 100) : 0
-      }));
-
-      if (updatedTotal > 0) {
-        const sum = withPct.reduce((a, r) => a + r.pct, 0);
-        const drift = round1(100 - sum);
-        if (Math.abs(drift) >= 0.1) {
-          let idx = 0;
-          for (let i = 1; i < withPct.length; i++) if (withPct[i].words > withPct[idx].words) idx = i;
-          withPct[idx].pct = round1(withPct[idx].pct + drift);
+    async function copyToClipboard(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch {
+        // fallback
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+          return true;
+        } catch {
+          return false;
         }
       }
-
-      return withPct;
     }
 
     // ---------- Parsing ----------
-    function parseScript(text, opts) {
-      const lines = (text || "").split(/\r?\n/);
-      const blocks = []; // {name, text, lineNo}
-      let current = null;
-      let ignored = 0;
+    // Output includes:
+    // - rowsRaw: per-speaker word totals (no "Other" grouping yet)
+    // - viewerLines: per-line objects for the script viewer (for highlighting and ignored lines)
+    function parseScript(rawText, opts) {
+      const text = rawText || "";
+      const lines = text.split(/\r?\n/);
 
+      // A speaker line must begin with CapitalLetter..., then colon
       const nameLineRe = /^\s*([A-Z][A-Za-z0-9_\- ]{0,40}?)\s*:\s*(.*)\s*$/;
-      const slideLineRe = /^\s*slide\b/i;
 
-      for (let idx = 0; idx < lines.length; idx++) {
-        const raw = lines[idx];
-        const line = raw.trimEnd();
-        const trimmed = line.trim();
+      // Ignore any line that has "slide" anywhere (case-insensitive)
+      // (This avoids "Slide 8:" being treated as a speaker)
+      const slideAnywhereRe = /\bslide\b/i;
+
+      let currentSpeaker = null;
+      let ignoredCount = 0;
+
+      const bySpeaker = new Map();
+      const viewerLines = []; // { type: 'spoken'|'ignored', speaker, text, reason, words }
+
+      function addWords(speaker, txt) {
+        const w = countWords(txt);
+        if (!speaker) return w;
+        bySpeaker.set(speaker, (bySpeaker.get(speaker) || 0) + w);
+        return w;
+      }
+
+      for (let i = 0; i < lines.length; i++) {
+        const original = lines[i];
+        const trimmedEnd = original.trimEnd();
+        const trimmed = trimmedEnd.trim();
+
         if (trimmed.length === 0) continue;
 
-        if (slideLineRe.test(trimmed)) { ignored++; continue; }
-
-        if (opts.ignoreBrackets) {
-          if (trimmed.startsWith('[') || trimmed.startsWith('(')) { ignored++; continue; }
+        // Ignore slide headings or slide mentions
+        if (slideAnywhereRe.test(trimmed)) {
+          ignoredCount++;
+          viewerLines.push({ type: 'ignored', speaker: null, text: trimmedEnd, reason: 'Slide line', words: 0 });
+          continue;
         }
 
-        const m = line.match(nameLineRe);
+        // Ignore stage directions: [ ... ] or ( ... )
+        if (opts.ignoreBrackets) {
+          if (trimmed.startsWith('[') || trimmed.startsWith('(')) {
+            ignoredCount++;
+            viewerLines.push({ type: 'ignored', speaker: null, text: trimmedEnd, reason: 'Stage direction', words: 0 });
+            continue;
+          }
+        }
+
+        const m = trimmedEnd.match(nameLineRe);
         if (m) {
-          const nmRaw = m[1] || "";
-          const nm = normalizeName(nmRaw, opts.caseSensitive);
-          if (/\bslide\b/i.test(nm)) { ignored++; current = null; continue; }
+          const nm = normalizeName(m[1] || "", opts.caseSensitive);
+
+          // extra safety: if "speaker name" includes "slide", ignore
+          if (slideAnywhereRe.test(nm)) {
+            ignoredCount++;
+            currentSpeaker = null;
+            viewerLines.push({ type: 'ignored', speaker: null, text: trimmedEnd, reason: 'Slide-like name', words: 0 });
+            continue;
+          }
 
           const txt = (m[2] || "").trim();
-          current = { name: nm, text: txt, lineNo: idx + 1 };
-          blocks.push(current);
+          currentSpeaker = nm;
+
+          const w = addWords(currentSpeaker, txt);
+          viewerLines.push({ type: 'spoken', speaker: currentSpeaker, text: txt, reason: null, words: w, rawLine: trimmedEnd });
         } else {
-          if (current) {
-            if (slideLineRe.test(trimmed)) { ignored++; continue; }
-            current.text = (current.text ? current.text + " " : "") + trimmed;
+          // Continuation line: counts as current speaker if exists
+          if (currentSpeaker) {
+            const w = addWords(currentSpeaker, trimmed);
+            viewerLines.push({ type: 'spoken', speaker: currentSpeaker, text: trimmed, reason: 'Continuation', words: w, rawLine: trimmedEnd });
           } else {
-            ignored++;
+            ignoredCount++;
+            viewerLines.push({ type: 'ignored', speaker: null, text: trimmedEnd, reason: 'No speaker yet', words: 0 });
           }
         }
       }
 
-      // Aggregate word counts
-      const bySpeaker = new Map();
-      for (const b of blocks) {
-        const w = countWords(b.text);
-        bySpeaker.set(b.name, (bySpeaker.get(b.name) || 0) + w);
-      }
-
-      let rows = [...bySpeaker.entries()]
+      // Build raw rows
+      const rowsRaw = [...bySpeaker.entries()]
         .map(([name, words]) => ({ name, words }))
-        .filter(r => r.name.length > 0 && Number.isFinite(r.words));
+        .filter(r => r.name && Number.isFinite(r.words));
 
-      const total = rows.reduce((acc, r) => acc + r.words, 0);
+      const totalWords = rowsRaw.reduce((a, r) => a + r.words, 0);
 
-      rows = rows.map(r => ({
+      // Percent (raw)
+      const rowsWithPctRaw = rowsRaw.map(r => ({
         ...r,
-        pct: total > 0 ? round1((r.words / total) * 100) : 0
+        pct: totalWords > 0 ? round1((r.words / totalWords) * 100) : 0
       }));
 
-      if (total > 0) {
-        const sum = rows.reduce((a, r) => a + r.pct, 0);
+      // Fix rounding drift (raw)
+      if (totalWords > 0 && rowsWithPctRaw.length > 0) {
+        const sum = rowsWithPctRaw.reduce((a, r) => a + r.pct, 0);
         const drift = round1(100 - sum);
         if (Math.abs(drift) >= 0.1) {
           let idx = 0;
-          for (let i = 1; i < rows.length; i++) if (rows[i].words > rows[idx].words) idx = i;
-          rows[idx].pct = round1(rows[idx].pct + drift);
+          for (let i = 1; i < rowsWithPctRaw.length; i++) if (rowsWithPctRaw[i].words > rowsWithPctRaw[idx].words) idx = i;
+          rowsWithPctRaw[idx].pct = round1(rowsWithPctRaw[idx].pct + drift);
         }
       }
 
-      // Merge tiny speakers
-      rows = mergeTinyToOther(rows, total, 1.0);
-
-      return { rows, totalWords: total, ignoredCount: ignored, blocks };
+      return { rowsRaw: rowsWithPctRaw, totalWords, ignoredCount, viewerLines };
     }
 
-    // ---------- Suggestions: "sounds better" engine ----------
-    function levenshtein(a, b) {
-      a = (a || "").toLowerCase();
-      b = (b || "").toLowerCase();
-      if (a === b) return 0;
-      const m = a.length, n = b.length;
-      const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
-      for (let i = 0; i <= m; i++) dp[i][0] = i;
-      for (let j = 0; j <= n; j++) dp[0][j] = j;
-      for (let i = 1; i <= m; i++) {
-        for (let j = 1; j <= n; j++) {
-          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-          dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
-        }
+    // ---------- "Other" grouping ----------
+    function applyOtherGrouping(rowsRaw, totalWords, enabled, thresholdPct) {
+      const t = Number.isFinite(thresholdPct) ? thresholdPct : 1.0;
+      if (!enabled || !rowsRaw.length || totalWords <= 0 || t <= 0) {
+        return { rows: rowsRaw, otherMembers: [] };
       }
-      return dp[m][n];
+
+      const small = [];
+      const big = [];
+
+      for (const r of rowsRaw) {
+        if (r.pct < t) small.push(r);
+        else big.push(r);
+      }
+
+      if (small.length === 0) return { rows: rowsRaw, otherMembers: [] };
+
+      const otherWords = small.reduce((a, r) => a + r.words, 0);
+      const otherPct = totalWords > 0 ? round1((otherWords / totalWords) * 100) : 0;
+
+      const rows = [...big, { name: "Other", words: otherWords, pct: otherPct }];
+
+      // Fix drift again
+      const sum = rows.reduce((a, r) => a + r.pct, 0);
+      const drift = round1(100 - sum);
+      if (Math.abs(drift) >= 0.1) {
+        let idx = 0;
+        for (let i = 1; i < rows.length; i++) if (rows[i].words > rows[idx].words) idx = i;
+        rows[idx].pct = round1(rows[idx].pct + drift);
+      }
+
+      return { rows, otherMembers: small.map(s => s.name) };
     }
 
-    function addSuggestion(listEl, tag, text) {
-      const li = document.createElement('li');
-      const t = document.createElement('span');
-      t.className = 'tag';
-      t.textContent = tag;
-      li.appendChild(t);
-      li.appendChild(document.createTextNode(text));
-      listEl.appendChild(li);
-    }
+    // ---------- Readability & pacing checks (Feature #4) ----------
+    function analyzeReadability(viewerLines) {
+      // Use spoken lines only
+      const spoken = viewerLines.filter(l => l.type === 'spoken' && l.speaker);
+      const text = spoken.map(l => l.text).join(' ').trim();
 
-    function renderSuggestions(rows, totalWords, blocks) {
-      const list = $('suggestionsList');
-      const enabledEl = $('enableSuggestions');
-      list.innerHTML = '';
+      const words = tokenizeWords(text);
+      const totalWords = words.length;
 
-      const enabled = enabledEl ? enabledEl.checked : true;
-      if (!enabled) { addSuggestion(list, 'Off', 'Suggestions are turned off.'); return; }
+      // Sentence split (simple heuristic)
+      const sentences = text
+        .split(/(?<=[.!?])\s+/)
+        .map(s => s.trim())
+        .filter(Boolean);
 
-      if (!rows || rows.length === 0 || totalWords <= 0) {
-        addSuggestion(list, 'Start', 'Paste a script and click Analyze to get suggestions.');
-        return;
+      const sentenceWordCounts = sentences.map(s => tokenizeWords(s).length).filter(n => n > 0);
+      const avgSentence = sentenceWordCounts.length ? (sentenceWordCounts.reduce((a,b)=>a+b,0) / sentenceWordCounts.length) : 0;
+
+      const longThreshold = 22; // long sentence threshold
+      const longSentences = sentenceWordCounts.filter(n => n >= longThreshold).length;
+      const longPct = sentenceWordCounts.length ? (longSentences / sentenceWordCounts.length) * 100 : 0;
+
+      // Consecutive long sentences
+      let maxLongStreak = 0;
+      let currentStreak = 0;
+      for (const n of sentenceWordCounts) {
+        if (n >= longThreshold) { currentStreak++; maxLongStreak = Math.max(maxLongStreak, currentStreak); }
+        else currentStreak = 0;
       }
 
-      // 1) Balance (still helpful)
-      const nonOtherRows = rows.filter(r => r.name !== 'Other');
-      const sorted = [...rows].sort((a,b)=>b.pct-a.pct);
-      const top = sorted[0];
-      if (top && top.pct >= 35 && top.name !== 'Other') {
-        const movePct = Math.max(0, top.pct - 30);
-        const moveWords = Math.max(10, Math.round((movePct/100)*totalWords));
-        addSuggestion(list, 'Balance', `${top.name} is speaking a lot (${top.pct.toFixed(1)}%). Consider moving about ${moveWords} words to other speakers for a smoother team feel.`);
+      // Filler starter detection (first word of each spoken line)
+      const fillers = new Set([
+        "yeah","so","okay","well","um","uh","like","actually","basically","right","alright","great"
+      ]);
+
+      const starters = [];
+      for (const l of spoken) {
+        const w = tokenizeWords(l.text);
+        if (w.length) starters.push(w[0].toLowerCase());
       }
 
-      // 2) Tiny speakers (excluding Other)
-      const low = nonOtherRows.filter(r => r.pct > 0 && r.pct < 5);
-      if (low.length > 0) {
-        const names = low.map(r => `${r.name} (${r.pct.toFixed(1)}%)`).join(', ');
-        addSuggestion(list, 'Balance', `Some speakers are very low: ${names}. Give each ~1–3 extra sentences so they feel intentional, not “cameo.”`);
+      const starterCounts = new Map();
+      for (const st of starters) {
+        if (!fillers.has(st)) continue;
+        starterCounts.set(st, (starterCounts.get(st) || 0) + 1);
       }
 
-      // 3) Name mismatch detection
-      const names = nonOtherRows.map(r => r.name);
-      const pairs = [];
-      for (let i = 0; i < names.length; i++) {
-        for (let j = i + 1; j < names.length; j++) {
-          const d = levenshtein(names[i], names[j]);
-          const maxLen = Math.max(names[i].length, names[j].length);
-          if (maxLen >= 4 && d > 0 && d <= 2) pairs.push([names[i], names[j]]);
-        }
-      }
-      if (pairs.length > 0) {
-        addSuggestion(list, 'Cleanup', `Possible name mismatches: ${pairs.slice(0,3).map(p=>`${p[0]} vs ${p[1]}`).join('; ')}. Make spelling consistent so counts + delivery are clean.`);
+      const topFiller = [...starterCounts.entries()].sort((a,b)=>b[1]-a[1])[0] || null;
+
+      // Repeated words (simple)
+      const lowerWords = words.map(w => w.toLowerCase());
+      let repeatRuns = 0;
+      for (let i = 1; i < lowerWords.length; i++) {
+        if (lowerWords[i] === lowerWords[i-1]) repeatRuns++;
       }
 
-      // Style / “sounds better” suggestions use blocks
-      const allText = (blocks || []).map(b => b.text).join(' ').replace(/\s+/g,' ').trim();
+      // Questions balance
+      const questionCount = (text.match(/\?/g) || []).length;
 
-      // 4) Long sentences: find top 3 longest sentences in entire script
-      const sentences = splitSentences(allText);
-      if (sentences.length > 0) {
-        const scored = sentences.map(s => ({ s, w: countWords(s) })).sort((a,b)=>b.w-a.w);
-        const longOnes = scored.filter(x => x.w >= 28).slice(0, 3);
-        if (longOnes.length > 0) {
-          addSuggestion(list, 'Flow', `You have ${longOnes.length} very long sentence(s) (28+ words). Split them into two shorter sentences for a punchier delivery.`);
-          longOnes.forEach((x, i) => {
-            addSuggestion(list, 'Example', `Long sentence ${i+1} (${x.w} words): “${clipWords(x.s, 14)}” → try: break after a natural pause (comma/“and”).`);
-          });
-        }
-      }
+      // Readability "flags"
+      const kpis = [];
+      const suggestions = [];
 
-      // 5) Repeated openers / filler phrases at start of lines
-      const openerCounts = new Map();
-      const openerPhrases = [
-        "yeah", "so", "okay", "great job", "sounds like", "that's amazing", "interesting", "to conclude", "thank you"
-      ];
-      const blockStarts = (blocks || [])
-        .map(b => (b.text || "").trim())
-        .filter(Boolean)
-        .map(t => t.split(/\s+/).slice(0, 3).join(' ').toLowerCase());
-
-      for (const start of blockStarts) {
-        for (const p of openerPhrases) {
-          if (start.startsWith(p)) openerCounts.set(p, (openerCounts.get(p) || 0) + 1);
-        }
-      }
-      const repeatedOpeners = [...openerCounts.entries()].filter(([p,c])=>c >= 3).sort((a,b)=>b[1]-a[1]);
-      if (repeatedOpeners.length > 0) {
-        const topRep = repeatedOpeners[0];
-        addSuggestion(list, 'Variety', `A lot of lines start with “${topRep[0]}” (${topRep[1]} times). Vary openers so the script sounds less repetitive (e.g., “Here’s the key point…”, “Next…”, “What we learned was…”).`);
-      }
-
-      // 6) Too many "we" sentences in a row (monotone cadence)
-      const weStarts = sentences.filter(s => /^\s*we\b/i.test(s)).length;
-      if (sentences.length >= 6 && weStarts / sentences.length > 0.45) {
-        addSuggestion(list, 'Voice', `Many sentences start with “We…” (${weStarts}/${sentences.length}). Mix in other structures: questions, “This means…”, “The result was…”, “That’s why…”, or start with the mission/robot instead of the team.`);
-      }
-
-      // 7) Acronyms & jargon: suggest defining once
-      const acronyms = [
-        { key: "qc", pretty: "QC", expand: "Quality Control" },
-        { key: "pid", pretty: "PID", expand: "Proportional–Integral–Derivative" },
-        { key: "lidar", pretty: "LiDAR", expand: "light detection and ranging" },
-        { key: "github", pretty: "GitHub", expand: "our code collaboration site" },
-        { key: "xcode", pretty: "Xcode", expand: "Apple’s development tool" }
-      ];
-      const lowerAll = allText.toLowerCase();
-      const used = acronyms.filter(a => lowerAll.includes(a.key));
-      if (used.length > 0) {
-        const missingDefs = used.filter(a => !new RegExp(`\\b${a.pretty}\\b\\s*\\(`,'i').test(allText)); // crude: looks for "QC ("
-        if (missingDefs.length > 0) {
-          addSuggestion(list, 'Clarity', `Define acronyms the first time you say them. Example: “${missingDefs[0].pretty} (${missingDefs[0].expand})” so judges never feel lost.`);
-        }
-      }
-
-      // 8) Transition structure check: hook/problem/solution/impact/close
-      const hasProblem = /problem|danger|risk|challenge|hard|difficult/i.test(allText);
-      const hasSolution = /solution|we created|we built|our robot|our app/i.test(allText);
-      const hasImpact = /impact|inspire|mentor|worldwide|anyone|accessible|download/i.test(allText);
-      const hasClose = /to conclude|in conclusion|do you have any questions|thank you/i.test(allText);
-      if (!hasProblem || !hasSolution || !hasImpact || !hasClose) {
-        const missing = [
-          !hasProblem ? "problem" : null,
-          !hasSolution ? "solution" : null,
-          !hasImpact ? "impact" : null,
-          !hasClose ? "closing line" : null
-        ].filter(Boolean).join(", ");
-        addSuggestion(list, 'Structure', `Consider tightening your story arc. Missing or weak: ${missing}. A clean flow is: Hook → Problem → Solution → Evidence → Impact → Close.`);
-      } else {
-        addSuggestion(list, 'Structure', `Your story arc is solid (problem → solution → impact → close). To make it sound even better, add one strong “hook” sentence at the very start.`);
-      }
-
-      // 9) Quick “make it punchier” micro-suggestions based on punctuation
-      const exclamations = (allText.match(/!/g) || []).length;
-      if (exclamations >= 6) {
-        addSuggestion(list, 'Tone', `You use a lot of exclamation points (${exclamations}). Keeping only the biggest moments makes the excitement feel more real.`);
-      }
-
-      // 10) Provide a ready-to-use “hook + close” template
-      addSuggestion(
-        list,
-        'Template',
-        `Hook idea: “What if you could map a dangerous cave without stepping inside?” Close idea: “We’d love your questions—and you can try driving the robot now.”`
-      );
-
-      // If somehow nothing got added (shouldn't happen)
-      if (list.children.length === 0) {
-        addSuggestion(list, 'OK', 'No major issues detected. Looks good!');
-      }
-    }
-
-    // ---------- Rendering ----------
-    let state = {
-      rows: [],
-      totalWords: 0,
-      ignoredCount: 0,
-      sortKey: 'words',
-      sortDir: 'desc',
-      blocks: []
-    };
-
-    function sortedRows() {
-      const mult = state.sortDir === 'asc' ? 1 : -1;
-      const rows = [...state.rows];
-      rows.sort((a, b) => {
-        if (state.sortKey === 'name') return a.name.localeCompare(b.name) * mult;
-        if (state.sortKey === 'pct') return (a.pct - b.pct) * mult;
-        return (a.words - b.words) * mult;
+      // KPI: Avg sentence length
+      kpis.push({
+        label: "Avg sentence length",
+        value: sentenceWordCounts.length ? `${avgSentence.toFixed(1)} words` : "N/A",
+        flag: sentenceWordCounts.length
+          ? (avgSentence <= 18 ? "good" : avgSentence <= 24 ? "warn" : "bad")
+          : "warn"
       });
-      return rows;
-    }
 
-    function renderTable() {
-      const body = $('tbl').querySelector('tbody');
-      body.innerHTML = '';
-      const rows = sortedRows();
+      // KPI: Long sentence %
+      kpis.push({
+        label: `Long sentences (≥${longThreshold}w)`,
+        value: sentenceWordCounts.length ? `${longPct.toFixed(0)}%` : "N/A",
+        flag: sentenceWordCounts.length
+          ? (longPct <= 15 ? "good" : longPct <= 30 ? "warn" : "bad")
+          : "warn"
+      });
 
-      for (const r of rows) {
-        const tr = document.createElement('tr');
+      // KPI: Questions
+      kpis.push({
+        label: "Question marks",
+        value: String(questionCount),
+        flag: questionCount >= 2 ? "good" : questionCount === 1 ? "warn" : "warn"
+      });
 
-        const tdName = document.createElement('td');
-        tdName.className = 'nameCell';
-        tdName.textContent = r.name;
+      // KPI: Total words (spoken)
+      kpis.push({
+        label: "Spoken words analyzed",
+        value: String(totalWords),
+        flag: totalWords >= 120 ? "good" : totalWords >= 60 ? "warn" : "warn"
+      });
 
-        const tdW = document.createElement('td');
-        tdW.className = 'right';
-        tdW.textContent = String(r.words);
-
-        const tdP = document.createElement('td');
-        tdP.className = 'right';
-        tdP.textContent = `${r.pct.toFixed(1)}%`;
-
-        tr.appendChild(tdName);
-        tr.appendChild(tdW);
-        tr.appendChild(tdP);
-        body.appendChild(tr);
+      // Suggestions based on metrics
+      if (sentenceWordCounts.length && avgSentence > 20) {
+        suggestions.push(`Try shortening some sentences. Your average sentence length is ${avgSentence.toFixed(1)} words. Breaking long sentences into two usually makes it sound more confident and easier to follow.`);
+      }
+      if (sentenceWordCounts.length && longPct > 20) {
+        suggestions.push(`You have a lot of long sentences (≥${longThreshold} words): ${longSentences}/${sentenceWordCounts.length}. Consider adding pauses, or splitting them into shorter lines.`);
+      }
+      if (maxLongStreak >= 2) {
+        suggestions.push(`There are ${maxLongStreak} long sentences in a row in at least one spot. Add a shorter “breath line” between them (a quick sentence or a handoff like “Here’s the key point.”).`);
+      }
+      if (topFiller && topFiller[1] >= 3) {
+        suggestions.push(`You start lines with “${topFiller[0]}” ${topFiller[1]} times. Swap some starters to sound stronger (e.g., “Here’s why…”, “The key is…”, “Our data shows…”, “Next…”).`);
+      }
+      if (repeatRuns >= 2) {
+        suggestions.push(`I noticed some repeated words back-to-back (${repeatRuns} times). Read it out loud once—those spots usually feel awkward and can be cleaned up quickly.`);
+      }
+      if (questionCount === 0 && totalWords > 0) {
+        suggestions.push(`Consider adding 1–2 “judge hook” questions to keep it engaging (e.g., “What if we could map caves without entering them?”).`);
       }
 
-      $('totalWords').textContent = String(state.totalWords);
-      $('speakerCount').textContent = String(state.rows.length);
-      $('ignoredCount').textContent = String(state.ignoredCount);
-    }
+      // Style / clarity suggestions (general but useful)
+      suggestions.push(`Add more handoff lines between speakers (“Back to you, ___.” / “Now ___ will explain…”). It sounds smoother and helps judges follow the story.`);
+      suggestions.push(`When you mention numbers (views, points, seconds, cost), pause slightly after the number—judges remember metrics better when they’re isolated.`);
+      suggestions.push(`If a line feels heavy, try “Because → Therefore” phrasing: “Because X, therefore we did Y.” It makes your logic sound crisp.`);
 
-    function renderLegend(rows) {
-      const el = $('legend');
-      el.innerHTML = '';
-      for (const r of rows) {
-        const key = document.createElement('div');
-        key.className = 'key';
-        const sw = document.createElement('span');
-        sw.className = 'swatch';
-        sw.style.background = hashColor(r.name);
-        key.appendChild(sw);
-        const label = document.createElement('span');
-        label.textContent = `${r.name} (${r.pct.toFixed(1)}%)`;
-        key.appendChild(label);
-        el.appendChild(key);
+      // Provide a couple example rewrites for common weak starters
+      if (totalWords > 0) {
+        suggestions.push(`Quick strength upgrade: replace “So basically…” with “In summary…” or “The key takeaway is…”`);
+        suggestions.push(`Quick strength upgrade: replace “We started by…” with “First, we…” or “Our first step was…”`);
       }
+
+      return { totalWords, sentences: sentenceWordCounts.length, avgSentence, longPct, questionCount, kpis, suggestions };
     }
 
+    // ---------- Summary text (Feature #7) ----------
+    function buildSummary(state) {
+      const rows = sortedRows(state);
+      const top = rows.slice(0, Math.min(6, rows.length));
+      const topLine = top.map(r => `${r.name}: ${r.pct.toFixed(1)}% (${r.words}w)`).join(" | ");
+      const otherNote = state.otherMembers && state.otherMembers.length
+        ? `Other includes: ${state.otherMembers.join(", ")}`
+        : "";
+
+      const r = state.readability || {};
+      const paceLine = (r && r.sentences)
+        ? `Readability: avg sentence ${r.avgSentence.toFixed(1)}w; long-sentence rate ${r.longPct.toFixed(0)}%; questions ${r.questionCount}.`
+        : `Readability: not enough data yet.`;
+
+      return [
+        "Speaker Share Summary",
+        "---------------------",
+        `Total spoken words: ${state.totalWords}`,
+        `Speakers counted: ${state.rows.length}`,
+        topLine ? `Top speakers: ${topLine}` : "Top speakers: (none)",
+        otherNote ? otherNote : "",
+        paceLine,
+        "",
+        "Tip: Click a speaker row to highlight their lines in the Script Viewer."
+      ].filter(Boolean).join("\n");
+    }
+
+    // ---------- Charts + table render ----------
     function clearCanvas(ctx, canvas) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = '#0b1020';
@@ -586,15 +735,17 @@ Aailya: Yeah, this is really hard work."></textarea>
         ctx.moveTo(cx, cy);
         ctx.arc(cx, cy, r, start, end);
         ctx.closePath();
-        ctx.fillStyle = hashColor(row.name);
+        ctx.fillStyle = (row.name === "Other") ? 'hsl(0 0% 70%)' : hashColor(row.name);
         ctx.fill();
         start = end;
       }
 
+      // donut hole
       ctx.globalCompositeOperation = 'destination-out';
       ctx.beginPath(); ctx.arc(cx, cy, r * 0.55, 0, Math.PI * 2); ctx.fill();
       ctx.globalCompositeOperation = 'source-over';
 
+      // center text
       ctx.fillStyle = 'rgba(230,232,239,.9)';
       ctx.font = '600 16px system-ui';
       ctx.textAlign = 'center';
@@ -616,6 +767,7 @@ Aailya: Yeah, this is really hard work."></textarea>
       const top = rows.slice(0, 12);
       const max = Math.max(1, ...top.map(r => r.words));
 
+      // axes
       ctx.strokeStyle = 'rgba(255,255,255,.12)';
       ctx.beginPath();
       ctx.moveTo(padL, padT);
@@ -627,7 +779,6 @@ Aailya: Yeah, this is really hard work."></textarea>
       const barW = (w - barGap * (top.length - 1)) / Math.max(1, top.length);
 
       ctx.font = '12px system-ui';
-      ctx.fillStyle = 'rgba(255,255,255,.65)';
 
       for (let i = 0; i < top.length; i++) {
         const r0 = top[i];
@@ -635,13 +786,15 @@ Aailya: Yeah, this is really hard work."></textarea>
         const x = padL + i * (barW + barGap);
         const y = padT + h - bh;
 
-        ctx.fillStyle = hashColor(r0.name);
+        ctx.fillStyle = (r0.name === "Other") ? 'hsl(0 0% 70%)' : hashColor(r0.name);
         ctx.fillRect(x, y, barW, bh);
 
+        // word label
         ctx.fillStyle = 'rgba(230,232,239,.9)';
         ctx.textAlign = 'center';
         ctx.fillText(String(r0.words), x + barW / 2, y - 4);
 
+        // name label
         const label = r0.name.length > 10 ? r0.name.slice(0, 9) + '…' : r0.name;
         ctx.fillStyle = 'rgba(255,255,255,.7)';
         ctx.fillText(label, x + barW / 2, padT + h + 16);
@@ -661,8 +814,7 @@ Aailya: Yeah, this is really hard work."></textarea>
       clearCanvas(ctx, c);
 
       const pad = 14;
-      const x0 = pad;
-      const y0 = pad;
+      const x0 = pad, y0 = pad;
       const w = c.width - pad * 2;
       const h = c.height - pad * 2;
 
@@ -672,14 +824,16 @@ Aailya: Yeah, this is really hard work."></textarea>
       let x = x0;
       for (const r0 of rows) {
         const segW = w * (r0.words / total);
-        ctx.fillStyle = hashColor(r0.name);
+        ctx.fillStyle = (r0.name === "Other") ? 'hsl(0 0% 70%)' : hashColor(r0.name);
         ctx.fillRect(x, y0, segW, h);
         x += segW;
       }
 
+      // outline
       ctx.strokeStyle = 'rgba(255,255,255,.15)';
       ctx.strokeRect(x0, y0, w, h);
 
+      // ticks
       ctx.fillStyle = 'rgba(255,255,255,.65)';
       ctx.font = '12px system-ui';
       ctx.textAlign = 'center';
@@ -689,17 +843,160 @@ Aailya: Yeah, this is really hard work."></textarea>
       ctx.textAlign = 'left';
     }
 
-    function renderAll() {
-      const rows = sortedRows();
-      renderTable();
-      drawPie(rows);
-      drawBar(rows);
-      drawStack(rows);
-      renderLegend(rows);
-      renderSuggestions(state.rows, state.totalWords, state.blocks);
+    function renderLegend(rows) {
+      const el = $('legend');
+      el.innerHTML = '';
+      for (const r of rows) {
+        const key = document.createElement('div');
+        key.className = 'key';
+        const sw = document.createElement('span');
+        sw.className = 'swatch';
+        sw.style.background = (r.name === "Other") ? 'hsl(0 0% 70%)' : hashColor(r.name);
+        key.appendChild(sw);
+        const label = document.createElement('span');
+        label.textContent = `${r.name} (${r.pct.toFixed(1)}%)`;
+        key.appendChild(label);
+        el.appendChild(key);
+      }
     }
 
-    // ---------- CSV ----------
+    // ---------- Script Viewer (Feature #8) ----------
+    function renderViewer(viewerLines, activeSet) {
+      const v = $('viewer');
+      const activeLabel = $('activeSpeakerLabel');
+
+      const activeNames = activeSet ? [...activeSet] : [];
+      activeLabel.textContent = activeNames.length ? (activeNames.length === 1 ? activeNames[0] : `${activeNames[0]} + ${activeNames.length-1}`) : "None";
+
+      const parts = [];
+      for (let i = 0; i < viewerLines.length; i++) {
+        const ln = viewerLines[i];
+        if (ln.type === 'ignored') {
+          parts.push(
+            `<span class="spLine spIgnored" data-idx="${i}" data-speaker="">` +
+              `${escapeHTML(ln.text)}` +
+              `<span class="tagIgnored">${escapeHTML(ln.reason || "Ignored")}</span>` +
+            `</span>`
+          );
+          continue;
+        }
+
+        const speaker = ln.speaker || "";
+        const isActive = activeSet && activeSet.size ? activeSet.has(speaker) : false;
+        const shouldDim = activeSet && activeSet.size ? !isActive : false;
+
+        const lineCls = [
+          "spLine",
+          isActive ? "activeLine" : "",
+          shouldDim ? "dimLine" : ""
+        ].filter(Boolean).join(" ");
+
+        const label = `${speaker}: `;
+        parts.push(
+          `<span class="${lineCls}" data-idx="${i}" data-speaker="${escapeHTML(speaker)}">` +
+            `<span class="spLabel">${escapeHTML(label)}</span>` +
+            `<span class="spText">${escapeHTML(ln.text || "")}</span>` +
+          `</span>`
+        );
+      }
+
+      v.innerHTML = parts.join("\n");
+
+      // Click on viewer line to highlight that speaker
+      v.querySelectorAll('.spLine').forEach(el => {
+        el.addEventListener('click', () => {
+          const sp = el.getAttribute('data-speaker') || "";
+          if (!sp) return;
+          setActiveSpeaker(sp);
+        });
+      });
+    }
+
+    // ---------- Table ----------
+    function renderTable(state) {
+      const body = $('tbl').querySelector('tbody');
+      body.innerHTML = '';
+      const rows = sortedRows(state);
+
+      for (const r of rows) {
+        const tr = document.createElement('tr');
+        tr.setAttribute('data-speaker', r.name);
+
+        const tdName = document.createElement('td');
+        tdName.className = 'nameCell';
+        tdName.textContent = r.name;
+
+        const tdW = document.createElement('td');
+        tdW.className = 'right';
+        tdW.textContent = String(r.words);
+
+        const tdP = document.createElement('td');
+        tdP.className = 'right';
+        tdP.textContent = `${r.pct.toFixed(1)}%`;
+
+        tr.appendChild(tdName);
+        tr.appendChild(tdW);
+        tr.appendChild(tdP);
+
+        // click-to-highlight speaker
+        tr.addEventListener('click', () => {
+          setActiveSpeaker(r.name);
+        });
+
+        body.appendChild(tr);
+      }
+
+      $('totalWords').textContent = String(state.totalWords);
+      $('speakerCount').textContent = String(state.rows.length);
+      $('ignoredCount').textContent = String(state.ignoredCount);
+    }
+
+    // ---------- Sorting ----------
+    function sortedRows(state) {
+      const mult = state.sortDir === 'asc' ? 1 : -1;
+      const rows = [...state.rows];
+      rows.sort((a, b) => {
+        if (state.sortKey === 'name') return a.name.localeCompare(b.name) * mult;
+        if (state.sortKey === 'pct') return (a.pct - b.pct) * mult;
+        return (a.words - b.words) * mult;
+      });
+      return rows;
+    }
+
+    // ---------- Suggestions Render ----------
+    function renderSuggestions(readability) {
+      const kpisEl = $('kpis');
+      const sugEl = $('suggestions');
+
+      kpisEl.innerHTML = '';
+      sugEl.innerHTML = '';
+
+      if (!readability || !readability.kpis) return;
+
+      for (const k of readability.kpis) {
+        const div = document.createElement('div');
+        div.className = 'kpi';
+        const flag = document.createElement('span');
+        flag.className = `flag ${k.flag}`;
+        flag.textContent = k.flag === 'good' ? 'Good' : k.flag === 'bad' ? 'Fix' : 'Watch';
+        const label = document.createElement('span');
+        label.textContent = k.label + ':';
+        const val = document.createElement('b');
+        val.textContent = k.value;
+        div.appendChild(flag);
+        div.appendChild(label);
+        div.appendChild(val);
+        kpisEl.appendChild(div);
+      }
+
+      for (const s of readability.suggestions || []) {
+        const li = document.createElement('li');
+        li.textContent = s;
+        sugEl.appendChild(li);
+      }
+    }
+
+    // ---------- CSV / JSON ----------
     function toCSV(rows) {
       const header = 'Speaker,Words,Percent';
       const lines = rows.map(r => {
@@ -709,41 +1006,278 @@ Aailya: Yeah, this is really hard work."></textarea>
       return [header, ...lines].join('\n');
     }
 
-    function download(filename, text) {
-      const blob = new Blob([text], { type: 'text/csv;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+    // ---------- PNG Report Export (Feature #7) ----------
+    function renderTableToCanvas(ctx, rows, x, y, width) {
+      const rowH = 18;
+      const col1 = Math.floor(width * 0.56);
+      const col2 = Math.floor(width * 0.20);
+      const col3 = width - col1 - col2;
+
+      // header
+      ctx.fillStyle = "rgba(255,255,255,0.85)";
+      ctx.font = "bold 13px system-ui";
+      ctx.fillText("Speaker", x + 6, y + 14);
+      ctx.fillText("Words", x + col1 + 6, y + 14);
+      ctx.fillText("Percent", x + col1 + col2 + 6, y + 14);
+
+      // lines
+      ctx.strokeStyle = "rgba(255,255,255,0.12)";
+      ctx.beginPath();
+      ctx.moveTo(x, y + 18);
+      ctx.lineTo(x + width, y + 18);
+      ctx.stroke();
+
+      // rows
+      ctx.font = "12px system-ui";
+      let yy = y + 36;
+      const maxRows = Math.min(rows.length, 22);
+      for (let i = 0; i < maxRows; i++) {
+        const r = rows[i];
+        ctx.fillStyle = "rgba(230,232,239,0.92)";
+        ctx.fillText(String(r.name).slice(0, 28), x + 6, yy);
+
+        ctx.fillStyle = "rgba(230,232,239,0.92)";
+        ctx.fillText(String(r.words), x + col1 + 6, yy);
+
+        ctx.fillStyle = "rgba(230,232,239,0.92)";
+        ctx.fillText(`${r.pct.toFixed(1)}%`, x + col1 + col2 + 6, yy);
+
+        // row separator
+        ctx.strokeStyle = "rgba(255,255,255,0.08)";
+        ctx.beginPath();
+        ctx.moveTo(x, yy + 6);
+        ctx.lineTo(x + width, yy + 6);
+        ctx.stroke();
+
+        yy += rowH;
+      }
+
+      if (rows.length > maxRows) {
+        ctx.fillStyle = "rgba(255,255,255,0.65)";
+        ctx.fillText(`(Showing top ${maxRows} rows)`, x + 6, yy + 6);
+        yy += rowH;
+      }
+
+      return yy;
+    }
+
+    function exportPNGReport(state) {
+      const rows = sortedRows(state);
+
+      const pie = $('pie');
+      const bar = $('bar');
+      const stack = $('stack');
+
+      const W = 1200;
+      const padding = 24;
+
+      // height estimate
+      const H = 900;
+
+      const out = document.createElement('canvas');
+      out.width = W;
+      out.height = H;
+      const ctx = out.getContext('2d');
+
+      // background
+      ctx.fillStyle = "#0b1020";
+      ctx.fillRect(0, 0, W, H);
+
+      // title
+      ctx.fillStyle = "rgba(230,232,239,0.95)";
+      ctx.font = "bold 22px system-ui";
+      ctx.fillText("Speaker Percentage Report", padding, 34);
+
+      ctx.fillStyle = "rgba(255,255,255,0.65)";
+      ctx.font = "13px system-ui";
+      ctx.fillText(`Total spoken words: ${state.totalWords}  •  Speakers: ${state.rows.length}  •  Ignored lines: ${state.ignoredCount}`, padding, 58);
+
+      // charts
+      // draw pie left, bar right, stack below
+      const chartY = 80;
+      const pieW = 560, pieH = 340;
+      const barW = 560, barH = 340;
+
+      ctx.drawImage(pie, padding, chartY, pieW, pieH);
+      ctx.drawImage(bar, padding + pieW + 24, chartY, barW, barH);
+
+      ctx.drawImage(stack, padding, chartY + pieH + 18, 1144, 130);
+
+      // table
+      const tableY = chartY + pieH + 18 + 150;
+      ctx.fillStyle = "rgba(255,255,255,0.10)";
+      ctx.fillRect(padding, tableY - 18, 1144, 430);
+
+      const endY = renderTableToCanvas(ctx, rows, padding, tableY, 1144);
+
+      // suggestions footer
+      const r = state.readability || null;
+      const sY = Math.min(endY + 12, H - 140);
+
+      ctx.fillStyle = "rgba(230,232,239,0.95)";
+      ctx.font = "bold 14px system-ui";
+      ctx.fillText("Readability & Pacing Notes", padding, sY);
+
+      ctx.fillStyle = "rgba(255,255,255,0.70)";
+      ctx.font = "12.5px system-ui";
+
+      const notes = [];
+      if (r && r.sentences) {
+        notes.push(`Avg sentence length: ${r.avgSentence.toFixed(1)} words.`);
+        notes.push(`Long-sentence rate: ${r.longPct.toFixed(0)}%.`);
+        notes.push(`Questions: ${r.questionCount}.`);
+      } else {
+        notes.push("Not enough spoken text to compute readability metrics.");
+      }
+      if (state.otherMembers && state.otherMembers.length) {
+        notes.push(`Other includes: ${state.otherMembers.join(", ")}`);
+      }
+
+      let yy = sY + 18;
+      for (const n of notes.slice(0, 5)) {
+        ctx.fillText("• " + n, padding, yy);
+        yy += 18;
+      }
+
+      out.toBlob((blob) => {
+        if (!blob) return;
+        downloadBlob("speaker_report.png", blob);
+      }, "image/png");
+    }
+
+    // ---------- State ----------
+    let state = {
+      rows: [],
+      rowsRaw: [],
+      totalWords: 0,
+      ignoredCount: 0,
+      sortKey: 'words',
+      sortDir: 'desc',
+      viewerLines: [],
+      otherMembers: [],
+      activeSet: new Set(),
+      readability: null,
+      lastAnalysis: null
+    };
+
+    // ---------- Active speaker highlight ----------
+    function setActiveSpeaker(name) {
+      // If clicking Other, highlight all small speakers
+      if (name === "Other" && state.otherMembers && state.otherMembers.length) {
+        state.activeSet = new Set(state.otherMembers);
+      } else {
+        state.activeSet = new Set([name]);
+      }
+      renderViewer(state.viewerLines, state.activeSet);
+    }
+
+    function clearHighlight() {
+      state.activeSet = new Set();
+      renderViewer(state.viewerLines, state.activeSet);
+    }
+
+    // ---------- Render All ----------
+    function renderAll() {
+      const rows = sortedRows(state);
+      renderTable(state);
+      drawPie(rows);
+      drawBar(rows);
+      drawStack(rows);
+      renderLegend(rows);
+
+      renderViewer(state.viewerLines, state.activeSet);
+      renderSuggestions(state.readability);
+
+      // Summary box
+      $('summaryBox').value = buildSummary(state);
+    }
+
+    // ---------- Main Analyze ----------
+    function analyzeNow() {
+      const opts = {
+        ignoreBrackets: $('ignoreBrackets').checked,
+        caseSensitive: $('caseSensitive').checked
+      };
+
+      const parsed = parseScript($('script').value, opts);
+
+      // group small speakers into Other
+      const groupEnabled = $('groupSmall').checked;
+      const threshold = Number($('smallPct').value);
+      const grouped = applyOtherGrouping(parsed.rowsRaw, parsed.totalWords, groupEnabled, threshold);
+
+      state.rowsRaw = parsed.rowsRaw;
+      state.rows = grouped.rows;
+      state.otherMembers = grouped.otherMembers;
+
+      state.totalWords = parsed.totalWords;
+      state.ignoredCount = parsed.ignoredCount;
+      state.viewerLines = parsed.viewerLines;
+
+      // Clear any highlight if speaker no longer exists
+      state.activeSet = new Set();
+
+      // readability analysis
+      state.readability = analyzeReadability(parsed.viewerLines);
+
+      // store analysis snapshot for JSON export
+      state.lastAnalysis = {
+        generatedAt: new Date().toISOString(),
+        options: {
+          ignoreBrackets: opts.ignoreBrackets,
+          caseSensitive: opts.caseSensitive,
+          groupSmall: groupEnabled,
+          smallPct: threshold
+        },
+        totals: {
+          totalWords: state.totalWords,
+          ignoredLines: state.ignoredCount
+        },
+        rows: state.rows,
+        otherMembers: state.otherMembers,
+        readability: {
+          spokenWordsAnalyzed: state.readability.totalWords,
+          sentences: state.readability.sentences,
+          avgSentenceWords: state.readability.avgSentence,
+          longSentenceRatePct: state.readability.longPct,
+          questionMarks: state.readability.questionCount,
+          suggestions: state.readability.suggestions
+        }
+      };
+
+      renderAll();
     }
 
     // ---------- Events ----------
-    function wireEvents() {
-      $('analyzeBtn').addEventListener('click', () => {
-        const opts = {
-          ignoreBrackets: $('ignoreBrackets').checked,
-          mergeSame: $('mergeSame').checked,
-          caseSensitive: $('caseSensitive').checked
-        };
-        const out = parseScript($('script').value, opts);
-        state.rows = out.rows;
-        state.totalWords = out.totalWords;
-        state.ignoredCount = out.ignoredCount;
-        state.blocks = out.blocks || [];
-        renderAll();
+    (function init() {
+      // Analyze
+      $('analyzeBtn').addEventListener('click', analyzeNow);
+
+      // Clear script
+      $('clearBtn').addEventListener('click', () => {
+        $('script').value = '';
       });
 
-      $('clearBtn').addEventListener('click', () => { $('script').value = ''; });
-
+      // Reset everything
       $('resetData').addEventListener('click', () => {
-        state = { rows: [], totalWords: 0, ignoredCount: 0, sortKey: 'words', sortDir: 'desc', blocks: [] };
+        state = {
+          rows: [],
+          rowsRaw: [],
+          totalWords: 0,
+          ignoredCount: 0,
+          sortKey: 'words',
+          sortDir: 'desc',
+          viewerLines: [],
+          otherMembers: [],
+          activeSet: new Set(),
+          readability: null,
+          lastAnalysis: null
+        };
+        $('summaryBox').value = '';
         renderAll();
       });
 
+      // Sorting
       $('sortName').addEventListener('click', () => { state.sortKey = 'name'; renderAll(); });
       $('sortWords').addEventListener('click', () => { state.sortKey = 'words'; renderAll(); });
       $('sortPct').addEventListener('click', () => { state.sortKey = 'pct'; renderAll(); });
@@ -754,37 +1288,56 @@ Aailya: Yeah, this is really hard work."></textarea>
         renderAll();
       });
 
+      // Clear highlight
+      $('clearHighlight').addEventListener('click', clearHighlight);
+
+      // Copy summary
+      $('copySummary').addEventListener('click', async () => {
+        const ok = await copyToClipboard($('summaryBox').value || '');
+        $('copySummary').textContent = ok ? 'Copied!' : 'Copy failed';
+        setTimeout(() => $('copySummary').textContent = 'Copy summary', 900);
+      });
+
+      // CSV
       $('downloadCsv').addEventListener('click', () => {
-        download('speaker_percentages.csv', toCSV(sortedRows()));
+        const rows = sortedRows(state);
+        downloadText('speaker_percentages.csv', toCSV(rows), 'text/csv;charset=utf-8');
       });
 
       $('copyCsv').addEventListener('click', async () => {
-        const csv = toCSV(sortedRows());
-        try {
-          await navigator.clipboard.writeText(csv);
-          $('copyCsv').textContent = 'Copied!';
-          setTimeout(() => $('copyCsv').textContent = 'Copy CSV', 900);
-        } catch {
-          const ta = document.createElement('textarea');
-          ta.value = csv;
-          document.body.appendChild(ta);
-          ta.select();
-          document.execCommand('copy');
-          ta.remove();
-          $('copyCsv').textContent = 'Copied!';
-          setTimeout(() => $('copyCsv').textContent = 'Copy CSV', 900);
+        const rows = sortedRows(state);
+        const csv = toCSV(rows);
+        const ok = await copyToClipboard(csv);
+        $('copyCsv').textContent = ok ? 'Copied!' : 'Copy failed';
+        setTimeout(() => $('copyCsv').textContent = 'Copy CSV', 900);
+      });
+
+      // JSON
+      $('downloadJson').addEventListener('click', () => {
+        const payload = state.lastAnalysis || { error: "Run Analyze first." };
+        downloadText('speaker_analysis.json', JSON.stringify(payload, null, 2), 'application/json;charset=utf-8');
+      });
+
+      // PNG report
+      $('downloadPng').addEventListener('click', () => {
+        if (!state.rows || !state.rows.length) {
+          alert("Run Analyze first so there is data to export.");
+          return;
         }
+        exportPNGReport(state);
       });
 
-      $('enableSuggestions').addEventListener('change', () => {
-        renderSuggestions(state.rows, state.totalWords, state.blocks);
+      // Re-analyze automatically if options change (nice UX)
+      ['ignoreBrackets','caseSensitive','groupSmall','smallPct'].forEach(id => {
+        $(id).addEventListener('change', () => {
+          // only auto-run if there is already text
+          if (($('script').value || '').trim().length > 0) analyzeNow();
+        });
       });
-    }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      wireEvents();
+      // Initial render
       renderAll();
-    });
+    })();
   </script>
 </body>
 </html>

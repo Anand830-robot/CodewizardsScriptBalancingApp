@@ -5,65 +5,25 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Speaker Percentage Calculator</title>
   <style>
-    :root{
-      --bg:#0b1020;--card:#121a33;--muted:#98a2b3;--text:#e6e8ef;--line:#243053;
-      --accent:#7c9cff;--good:#2dd4bf;--warn:#fbbf24;--bad:#fb7185;
-    }
+    :root{--bg:#0b1020;--card:#121a33;--muted:#98a2b3;--text:#e6e8ef;--line:#243053;--accent:#7c9cff;--good:#2dd4bf;--warn:#fbbf24;--bad:#fb7185;}
     *{box-sizing:border-box}
-    body{
-      margin:0;
-      background:linear-gradient(180deg,#070a14 0%, #0b1020 40%, #070a14 100%);
-      color:var(--text);
-      font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-    }
+    body{margin:0;background:linear-gradient(180deg,#070a14 0%, #0b1020 40%, #070a14 100%);color:var(--text);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
     a{color:var(--accent)}
     .wrap{max-width:1100px;margin:0 auto;padding:22px;}
     h1{margin:0 0 6px;font-size:26px;letter-spacing:.2px}
     .sub{color:var(--muted);margin:0 0 18px}
     .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
     @media (max-width: 900px){.grid{grid-template-columns:1fr}}
-    .card{
-      background:rgba(18,26,51,.92);
-      border:1px solid rgba(36,48,83,.9);
-      border-radius:16px;
-      box-shadow:0 10px 30px rgba(0,0,0,.35);
-      padding:14px
-    }
+    .card{background:rgba(18,26,51,.92);border:1px solid rgba(36,48,83,.9);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);padding:14px}
     .card h2{margin:0 0 10px;font-size:16px;color:#d7dcff}
-    textarea{
-      width:100%;
-      min-height:210px;
-      resize:vertical;
-      background:#0b1020;
-      color:var(--text);
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:12px;
-      font:13px/1.4 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
-      outline:none
-    }
-    textarea:focus,input:focus{
-      border-color:rgba(124,156,255,.9);
-      box-shadow:0 0 0 3px rgba(124,156,255,.18)
-    }
+    textarea{width:100%;min-height:210px;resize:vertical;background:#0b1020;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:12px;font:13px/1.4 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;outline:none}
+    textarea:focus,input:focus{border-color:rgba(124,156,255,.9);box-shadow:0 0 0 3px rgba(124,156,255,.18)}
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .btn{
-      appearance:none;
-      border:1px solid var(--line);
-      background:#0b1020;
-      color:var(--text);
-      padding:9px 12px;
-      border-radius:12px;
-      cursor:pointer
-    }
+    .btn{appearance:none;border:1px solid var(--line);background:#0b1020;color:var(--text);padding:9px 12px;border-radius:12px;cursor:pointer}
     .btn:hover{border-color:rgba(124,156,255,.7)}
     .btn.primary{background:rgba(124,156,255,.18);border-color:rgba(124,156,255,.45)}
     .btn.danger{background:rgba(251,113,133,.12);border-color:rgba(251,113,133,.35)}
-    .pill{
-      display:inline-flex;gap:8px;align-items:center;
-      padding:8px 10px;border:1px solid var(--line);
-      border-radius:999px;background:#0b1020;color:var(--muted)
-    }
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:999px;background:#0b1020;color:var(--muted)}
     .pill b{color:var(--text)}
     .mini{font-size:12px;color:var(--muted)}
     table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:12px}
@@ -72,41 +32,27 @@
     tr:hover td{background:rgba(124,156,255,.06)}
     .right{text-align:right}
     .nameCell{font-weight:600}
+    .warn{color:var(--warn)}
+    .good{color:var(--good)}
+    .bad{color:var(--bad)}
     .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
     .controls .left{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    input[type="text"],input[type="number"]{background:#0b1020;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:9px 10px;outline:none}
+    input[type="number"]{width:110px}
     .split{display:grid;grid-template-columns:1fr;gap:12px}
-    canvas{
-      width:100%;height:auto;background:#0b1020;border:1px solid var(--line);
-      border-radius:12px
-    }
+    canvas{width:100%;height:auto;background:#0b1020;border:1px solid var(--line);border-radius:12px}
     .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
     .key{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}
     .swatch{width:12px;height:12px;border-radius:3px;border:1px solid rgba(255,255,255,.12)}
     .footer{margin-top:12px;color:var(--muted);font-size:12px}
     code{background:rgba(255,255,255,.06);padding:2px 6px;border-radius:8px}
-    .toast{
-      margin-top:10px;
-      padding:10px 12px;
-      border:1px solid rgba(124,156,255,.35);
-      background:rgba(124,156,255,.10);
-      border-radius:12px;
-      color:rgba(230,232,239,.9);
-      display:none;
-      font-size:12px
-    }
-    .toast.err{
-      border-color: rgba(251,113,133,.35);
-      background: rgba(251,113,133,.10);
-    }
+    ul{margin:10px 0 0 18px}
   </style>
 </head>
 <body>
   <div class="wrap">
     <h1>Speaker Percentage Calculator</h1>
-    <p class="sub">
-      Paste your script (format: <code>Name:</code> dialogue). The app counts words per speaker and calculates percentages (rounded to 0.1%).
-      Lines starting with <code>Slide</code> are ignored.
-    </p>
+    <p class="sub">Paste your script (format: <code>Name:</code> dialogue). The app counts words per speaker and calculates percentages (rounded to 0.1%).</p>
 
     <div class="grid">
       <div class="card">
@@ -123,15 +69,11 @@ Aailya: Yeah, this is really hard work."></textarea>
           <span class="pill"><span>Total words:</span> <b id="totalWords">0</b></span>
           <span class="pill"><span>Speakers:</span> <b id="speakerCount">0</b></span>
           <span class="pill"><span>Ignored lines:</span> <b id="ignoredCount">0</b></span>
-          <span class="pill"><span>Merged into Other:</span> <b id="otherCount">0</b></span>
         </div>
 
-        <div id="toast" class="toast"></div>
-
         <div class="footer">
-          Notes: lines starting with <code>[</code> or <code>(</code> are ignored as stage directions.
-          Lines that start with <code>Slide</code> are ignored.
-          If someone speaks across multiple lines, lines without <code>Name:</code> are treated as continuation of the previous speaker.
+          Notes: lines starting with <code>[</code> or <code>(</code> are ignored as stage directions. Lines that start with <code>Slide</code> are ignored.
+          If someone speaks across multiple lines, lines <em>without</em> <code>Name:</code> are treated as continuation of the previous speaker.
         </div>
       </div>
 
@@ -139,8 +81,8 @@ Aailya: Yeah, this is really hard work."></textarea>
         <h2>Options</h2>
         <div class="split">
           <label class="mini"><input type="checkbox" id="ignoreBrackets" checked /> Ignore bracket/parenthesis stage directions</label>
+          <label class="mini"><input type="checkbox" id="mergeSame" checked /> Merge repeated speaker blocks</label>
           <label class="mini"><input type="checkbox" id="caseSensitive" /> Case-sensitive names (normally OFF)</label>
-          <label class="mini"><input type="checkbox" id="mergeTiny" checked /> Combine speakers under 1.0% into <b>Other</b></label>
 
           <div class="controls">
             <div class="left">
@@ -158,7 +100,7 @@ Aailya: Yeah, this is really hard work."></textarea>
           <div class="row">
             <button class="btn" id="downloadCsv" type="button">Download CSV</button>
             <button class="btn" id="copyCsv" type="button">Copy CSV</button>
-            <button class="btn danger" id="resetData" type="button">Reset</button>
+            <button class="btn danger" id="resetData" type="button">Reset table</button>
           </div>
 
           <div class="mini">CSV columns: Speaker, Words, Percent</div>
@@ -169,6 +111,22 @@ Aailya: Yeah, this is really hard work."></textarea>
     <div class="grid" style="margin-top:16px">
       <div class="card">
         <h2>Results table</h2>
+
+        <!-- Suggestions box (Feature #7) -->
+        <div id="suggestionsBox" style="margin:10px 0 12px; padding:12px; border:1px solid rgba(36,48,83,.7); border-radius:12px; background:#0b1020;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+            <div style="font-weight:700; color:#d7dcff;">Suggestions</div>
+            <label class="mini" style="display:flex; align-items:center; gap:8px; margin:0;">
+              <input type="checkbox" id="enableSuggestions" checked />
+              Enable
+            </label>
+          </div>
+          <div class="mini" style="margin-top:6px; color:rgba(255,255,255,.65);">
+            Tips based on speaker balance, tiny speakers, and possible name mismatches.
+          </div>
+          <ul id="suggestionsList" style="margin:10px 0 0 18px; padding:0; color:rgba(230,232,239,.92);"></ul>
+        </div>
+
         <div style="overflow:auto;border-radius:12px;border:1px solid rgba(36,48,83,.7)">
           <table id="tbl">
             <thead>
@@ -181,9 +139,7 @@ Aailya: Yeah, this is really hard work."></textarea>
             <tbody></tbody>
           </table>
         </div>
-        <div class="mini" style="margin-top:8px">
-          Tip: If a name is misspelled in your script (e.g., Aaliya vs Aailya), it will count as two speakers.
-        </div>
+        <div class="mini" style="margin-top:8px">Tip: If a name is misspelled in your script (e.g., Aaliya vs Aailya), it will count as two separate speakers.</div>
       </div>
 
       <div class="card">
@@ -207,526 +163,592 @@ Aailya: Yeah, this is really hard work."></textarea>
     </div>
 
     <div class="footer" style="margin-top:18px">
-      GitHub Pages tip: this file must be named <code>index.html</code> in the configured Pages folder.
-      Hard refresh after updating (Cmd+Shift+R on Mac).
+      If your GitHub Pages page shows raw code: make sure this file is named <code>index.html</code> in your repository root (or in the configured Pages folder).
     </div>
   </div>
 
   <script>
-    // Wrap everything so the Analyze button ALWAYS works after the DOM exists
-    document.addEventListener('DOMContentLoaded', () => {
-      // ---------- Helpers ----------
-      const $ = (id) => document.getElementById(id);
+    // ---------- Helpers ----------
+    const $ = (id) => document.getElementById(id);
 
-      function showToast(msg, isErr=false) {
-        const t = $('toast');
-        if (!t) return;
-        t.textContent = msg;
-        t.classList.toggle('err', !!isErr);
-        t.style.display = 'block';
-        setTimeout(() => { t.style.display = 'none'; }, 2400);
+    function normalizeName(name, caseSensitive) {
+      const n = (name || "").trim();
+      if (!n) return "";
+      if (caseSensitive) return n;
+      // normalize: Capitalize first letter, keep rest as-is
+      return n[0].toUpperCase() + n.slice(1);
+    }
+
+    function countWords(text) {
+      const m = (text || "").match(/[A-Za-z0-9]+(?:'[A-Za-z0-9]+)*/g);
+      return m ? m.length : 0;
+    }
+
+    function hashColor(str) {
+      let h = 2166136261;
+      for (let i = 0; i < str.length; i++) {
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
       }
+      const hue = Math.abs(h) % 360;
+      return `hsl(${hue} 70% 60%)`;
+    }
 
-      function normalizeName(name, caseSensitive) {
-        const n = (name || '').trim();
-        if (!n) return '';
-        if (caseSensitive) return n;
-        return n[0].toUpperCase() + n.slice(1);
-      }
+    function round1(x) {
+      return Math.round(x * 10) / 10;
+    }
 
-      function countWords(text) {
-        const m = (text || '').match(/[A-Za-z0-9]+(?:'[A-Za-z0-9]+)*/g);
-        return m ? m.length : 0;
-      }
+    // ---------- Feature: merge tiny speakers into "Other" (< 1%) ----------
+    function mergeTinyToOther(rows, totalWords, thresholdPct = 1.0) {
+      if (!rows || rows.length === 0 || totalWords <= 0) return rows;
 
-      function hashColor(str) {
-        let h = 2166136261;
-        for (let i = 0; i < str.length; i++) {
-          h ^= str.charCodeAt(i);
-          h = Math.imul(h, 16777619);
-        }
-        const hue = Math.abs(h) % 360;
-        return `hsl(${hue} 70% 60%)`;
-      }
+      const kept = [];
+      let otherWords = 0;
 
-      function round1(x) { return Math.round(x * 10) / 10; }
-
-      // ---------- Parsing ----------
-      function parseScript(text, opts) {
-        const lines = (text || '').split(/\r?\n/);
-
-        // Blocks accumulate text per speaker
-        const blocks = []; // {name, text}
-        let current = null;
-
-        let ignored = 0;
-
-        // Strict format: Name (capital first letter) + colon
-        const nameLineRe = /^\s*([A-Z][A-Za-z0-9_\- ]{0,40}?)\s*:\s*(.*)\s*$/;
-
-        // Ignore any line that starts with "Slide" (case-insensitive)
-        const slideLineRe = /^\s*slide\b/i;
-
-        for (const raw of lines) {
-          const line = raw.trimEnd();
-          const trimmed = line.trim();
-          if (!trimmed) continue;
-
-          // Ignore slide lines
-          if (slideLineRe.test(trimmed)) { ignored++; continue; }
-
-          // Ignore stage directions
-          if (opts.ignoreBrackets) {
-            if (trimmed.startsWith('[') || trimmed.startsWith('(')) { ignored++; continue; }
-          }
-
-          const m = line.match(nameLineRe);
-          if (m) {
-            const nm = normalizeName(m[1] || '', opts.caseSensitive);
-
-            // Extra protection: never allow "Slide ..." to become a name
-            if (/\bslide\b/i.test(nm)) { ignored++; current = null; continue; }
-
-            const txt = (m[2] || '').trim();
-            current = { name: nm, text: txt };
-            blocks.push(current);
-          } else {
-            // Continuation: assign to last speaker
-            if (current) {
-              if (slideLineRe.test(trimmed)) { ignored++; continue; }
-              current.text = (current.text ? current.text + ' ' : '') + trimmed;
-            } else {
-              ignored++;
-            }
-          }
-        }
-
-        // Aggregate words by speaker
-        const bySpeaker = new Map();
-        for (const b of blocks) {
-          const w = countWords(b.text);
-          if (!b.name) continue;
-          bySpeaker.set(b.name, (bySpeaker.get(b.name) || 0) + w);
-        }
-
-        let rows = [...bySpeaker.entries()]
-          .map(([name, words]) => ({ name, words }))
-          .filter(r => r.name && Number.isFinite(r.words));
-
-        const total = rows.reduce((a, r) => a + r.words, 0);
-
-        // If total is 0, return early
-        if (total <= 0) {
-          return { rows: [], totalWords: 0, ignoredCount: ignored, mergedIntoOther: 0 };
-        }
-
-        // Compute pct (unrounded) for merging logic
-        const rawPct = rows.map(r => ({...r, pctRaw: (r.words / total) * 100}));
-
-        // Merge < 1% into Other (before rounding)
-        let mergedIntoOther = 0;
-        if (opts.mergeTiny) {
-          let otherWords = 0;
-          const kept = [];
-          for (const r of rawPct) {
-            if (r.pctRaw < 1.0) {
-              otherWords += r.words;
-              mergedIntoOther++;
-            } else {
-              kept.push(r);
-            }
-          }
-          if (otherWords > 0) {
-            kept.push({ name: 'Other', words: otherWords, pctRaw: (otherWords / total) * 100 });
-          }
-          rows = kept.map(({name, words}) => ({name, words}));
+      for (const r of rows) {
+        const pct = (r.words / totalWords) * 100;
+        if (pct < thresholdPct) {
+          otherWords += r.words;
         } else {
-          rows = rawPct.map(({name, words}) => ({name, words}));
+          kept.push({ ...r });
         }
+      }
 
-        // Recompute pct after possible merging
-        const total2 = rows.reduce((a, r) => a + r.words, 0);
-        let withPct = rows.map(r => ({
-          ...r,
-          pct: total2 > 0 ? round1((r.words / total2) * 100) : 0
-        }));
+      if (otherWords > 0) {
+        kept.push({ name: 'Other', words: otherWords, pct: 0 });
+      }
 
-        // Fix rounding drift: adjust largest slice so sum=100.0
+      // Recompute pct with rounding
+      const updatedTotal = kept.reduce((a, r) => a + r.words, 0);
+      const withPct = kept.map(r => ({
+        ...r,
+        pct: updatedTotal > 0 ? round1((r.words / updatedTotal) * 100) : 0
+      }));
+
+      // Fix rounding drift so it totals ~100.0
+      if (updatedTotal > 0) {
         const sum = withPct.reduce((a, r) => a + r.pct, 0);
         const drift = round1(100 - sum);
-        if (Math.abs(drift) >= 0.1 && withPct.length > 0) {
+        if (Math.abs(drift) >= 0.1) {
           let idx = 0;
-          for (let i = 1; i < withPct.length; i++) {
-            if (withPct[i].words > withPct[idx].words) idx = i;
-          }
+          for (let i = 1; i < withPct.length; i++) if (withPct[i].words > withPct[idx].words) idx = i;
           withPct[idx].pct = round1(withPct[idx].pct + drift);
         }
-
-        return {
-          rows: withPct,
-          totalWords: total2,
-          ignoredCount: ignored,
-          mergedIntoOther
-        };
       }
 
-      // ---------- State ----------
-      let state = {
-        rows: [],
-        totalWords: 0,
-        ignoredCount: 0,
-        mergedIntoOther: 0,
-        sortKey: 'words',
-        sortDir: 'desc'
-      };
+      return withPct;
+    }
 
-      function sortedRows() {
-        const mult = state.sortDir === 'asc' ? 1 : -1;
-        const rows = [...state.rows];
-        rows.sort((a, b) => {
-          if (state.sortKey === 'name') return a.name.localeCompare(b.name) * mult;
-          if (state.sortKey === 'pct') return (a.pct - b.pct) * mult;
-          return (a.words - b.words) * mult;
-        });
-        return rows;
-      }
+    // ---------- Parsing ----------
+    function parseScript(text, opts) {
+      const lines = (text || "").split(/\r?\n/);
+      const blocks = [];
+      let current = null;
+      let ignored = 0;
 
-      // ---------- Rendering ----------
-      function renderTable() {
-        const tbl = $('tbl');
-        if (!tbl) return;
-        const body = tbl.querySelector('tbody');
-        body.innerHTML = '';
+      // Name must start with a capital letter and end with colon
+      const nameLineRe = /^\s*([A-Z][A-Za-z0-9_\- ]{0,40}?)\s*:\s*(.*)\s*$/;
+      const slideLineRe = /^\s*slide\b/i; // ignore "Slide ..." lines
 
-        const rows = sortedRows();
-        for (const r of rows) {
-          const tr = document.createElement('tr');
+      for (const raw of lines) {
+        const line = raw.trimEnd();
+        const trimmed = line.trim();
+        if (trimmed.length === 0) continue;
 
-          const tdName = document.createElement('td');
-          tdName.className = 'nameCell';
-          tdName.textContent = r.name;
+        // Ignore slide headings
+        if (slideLineRe.test(trimmed)) { ignored++; continue; }
 
-          const tdW = document.createElement('td');
-          tdW.className = 'right';
-          tdW.textContent = String(r.words);
-
-          const tdP = document.createElement('td');
-          tdP.className = 'right';
-          tdP.textContent = `${r.pct.toFixed(1)}%`;
-
-          tr.appendChild(tdName);
-          tr.appendChild(tdW);
-          tr.appendChild(tdP);
-          body.appendChild(tr);
+        // Ignore stage directions
+        if (opts.ignoreBrackets) {
+          if (trimmed.startsWith('[') || trimmed.startsWith('(')) { ignored++; continue; }
         }
 
-        $('totalWords').textContent = String(state.totalWords);
-        $('speakerCount').textContent = String(state.rows.length);
-        $('ignoredCount').textContent = String(state.ignoredCount);
-        $('otherCount').textContent = String(state.mergedIntoOther);
-      }
+        const m = line.match(nameLineRe);
+        if (m) {
+          const nmRaw = m[1] || "";
+          const nm = normalizeName(nmRaw, opts.caseSensitive);
 
-      function renderLegend(rows) {
-        const el = $('legend');
-        if (!el) return;
-        el.innerHTML = '';
-        for (const r of rows) {
-          const key = document.createElement('div');
-          key.className = 'key';
-          const sw = document.createElement('span');
-          sw.className = 'swatch';
-          sw.style.background = hashColor(r.name);
-          key.appendChild(sw);
-          const label = document.createElement('span');
-          label.textContent = `${r.name} (${r.pct.toFixed(1)}%)`;
-          key.appendChild(label);
-          el.appendChild(key);
+          // Safety: ignore any accidental speaker name containing "slide"
+          if (/\bslide\b/i.test(nm)) { ignored++; current = null; continue; }
+
+          const txt = (m[2] || "").trim();
+          current = { name: nm, text: txt };
+          blocks.push(current);
+        } else {
+          // Continuation line
+          if (current) {
+            // Also ignore slide headings that appear as continuation lines
+            if (slideLineRe.test(trimmed)) { ignored++; continue; }
+            current.text = (current.text ? current.text + " " : "") + trimmed;
+          } else {
+            ignored++;
+          }
         }
       }
 
-      function clearCanvas(ctx, canvas) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#0b1020';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Aggregate word counts
+      const bySpeaker = new Map();
+      for (const b of blocks) {
+        const w = countWords(b.text);
+        bySpeaker.set(b.name, (bySpeaker.get(b.name) || 0) + w);
       }
 
-      function drawPie(rows) {
-        const c = $('pie');
-        if (!c) return;
-        const ctx = c.getContext('2d');
-        clearCanvas(ctx, c);
+      let rows = [...bySpeaker.entries()]
+        .map(([name, words]) => ({ name, words }))
+        .filter(r => r.name.length > 0 && Number.isFinite(r.words));
 
-        const cx = c.width * 0.36;
-        const cy = c.height * 0.5;
-        const r = Math.min(c.width, c.height) * 0.34;
+      const total = rows.reduce((acc, r) => acc + r.words, 0);
 
-        const total = rows.reduce((a, rr) => a + rr.words, 0);
-        let start = -Math.PI / 2;
+      rows = rows.map(r => ({
+        ...r,
+        pct: total > 0 ? round1((r.words / total) * 100) : 0
+      }));
 
-        if (total <= 0) {
-          ctx.fillStyle = 'rgba(255,255,255,.15)';
-          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
-          ctx.fillStyle = 'rgba(255,255,255,.6)';
-          ctx.font = '14px system-ui';
-          ctx.fillText('Paste a script and click Analyze', cx - r, cy);
-          return;
-        }
-
-        for (const row of rows) {
-          const frac = row.words / total;
-          const end = start + frac * Math.PI * 2;
-          ctx.beginPath();
-          ctx.moveTo(cx, cy);
-          ctx.arc(cx, cy, r, start, end);
-          ctx.closePath();
-          ctx.fillStyle = hashColor(row.name);
-          ctx.fill();
-          start = end;
-        }
-
-        // donut hole
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.beginPath(); ctx.arc(cx, cy, r * 0.55, 0, Math.PI * 2); ctx.fill();
-        ctx.globalCompositeOperation = 'source-over';
-
-        // center text
-        ctx.fillStyle = 'rgba(230,232,239,.9)';
-        ctx.font = '600 16px system-ui';
-        ctx.textAlign = 'center';
-        ctx.fillText('Total', cx, cy - 6);
-        ctx.font = '600 18px system-ui';
-        ctx.fillText(String(total), cx, cy + 18);
-        ctx.textAlign = 'left';
-      }
-
-      function drawBar(rows) {
-        const c = $('bar');
-        if (!c) return;
-        const ctx = c.getContext('2d');
-        clearCanvas(ctx, c);
-
-        const padL = 46, padR = 14, padT = 18, padB = 28;
-        const w = c.width - padL - padR;
-        const h = c.height - padT - padB;
-
-        const top = rows.slice(0, 12);
-        const max = Math.max(1, ...top.map(r => r.words));
-
-        // axes
-        ctx.strokeStyle = 'rgba(255,255,255,.12)';
-        ctx.beginPath();
-        ctx.moveTo(padL, padT);
-        ctx.lineTo(padL, padT + h);
-        ctx.lineTo(padL + w, padT + h);
-        ctx.stroke();
-
-        const barGap = 8;
-        const barW = (w - barGap * (top.length - 1)) / Math.max(1, top.length);
-
-        ctx.font = '12px system-ui';
-
-        for (let i = 0; i < top.length; i++) {
-          const r0 = top[i];
-          const bh = (r0.words / max) * (h - 10);
-          const x = padL + i * (barW + barGap);
-          const y = padT + h - bh;
-
-          ctx.fillStyle = hashColor(r0.name);
-          ctx.fillRect(x, y, barW, bh);
-
-          // word label
-          ctx.fillStyle = 'rgba(230,232,239,.9)';
-          ctx.textAlign = 'center';
-          ctx.fillText(String(r0.words), x + barW / 2, y - 4);
-
-          // name label
-          const label = r0.name.length > 10 ? r0.name.slice(0, 9) + '…' : r0.name;
-          ctx.fillStyle = 'rgba(255,255,255,.7)';
-          ctx.fillText(label, x + barW / 2, padT + h + 16);
-        }
-        ctx.textAlign = 'left';
-
-        if (rows.length > top.length) {
-          ctx.fillStyle = 'rgba(255,255,255,.55)';
-          ctx.font = '12px system-ui';
-          ctx.fillText(`Showing top ${top.length} of ${rows.length}`, padL, 14);
+      // Rounding drift fix
+      if (total > 0) {
+        const sum = rows.reduce((a, r) => a + r.pct, 0);
+        const drift = round1(100 - sum);
+        if (Math.abs(drift) >= 0.1) {
+          let idx = 0;
+          for (let i = 1; i < rows.length; i++) if (rows[i].words > rows[idx].words) idx = i;
+          rows[idx].pct = round1(rows[idx].pct + drift);
         }
       }
 
-      function drawStack(rows) {
-        const c = $('stack');
-        if (!c) return;
-        const ctx = c.getContext('2d');
-        clearCanvas(ctx, c);
+      // Merge tiny speakers into Other (<1%)
+      rows = mergeTinyToOther(rows, total, 1.0);
 
-        const pad = 14;
-        const x0 = pad;
-        const y0 = pad;
-        const w = c.width - pad * 2;
-        const h = c.height - pad * 2;
+      return { rows, totalWords: total, ignoredCount: ignored };
+    }
 
-        const total = rows.reduce((a, rr) => a + rr.words, 0);
-        if (total <= 0) return;
-
-        let x = x0;
-        for (const r0 of rows) {
-          const segW = w * (r0.words / total);
-          ctx.fillStyle = hashColor(r0.name);
-          ctx.fillRect(x, y0, segW, h);
-          x += segW;
+    // ---------- Feature #7: Suggestions engine ----------
+    function levenshtein(a, b) {
+      a = (a || "").toLowerCase();
+      b = (b || "").toLowerCase();
+      if (a === b) return 0;
+      const m = a.length, n = b.length;
+      const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+      for (let i = 0; i <= m; i++) dp[i][0] = i;
+      for (let j = 0; j <= n; j++) dp[0][j] = j;
+      for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+          dp[i][j] = Math.min(
+            dp[i - 1][j] + 1,
+            dp[i][j - 1] + 1,
+            dp[i - 1][j - 1] + cost
+          );
         }
-
-        ctx.strokeStyle = 'rgba(255,255,255,.15)';
-        ctx.strokeRect(x0, y0, w, h);
-
-        ctx.fillStyle = 'rgba(255,255,255,.65)';
-        ctx.font = '12px system-ui';
-        ctx.textAlign = 'center';
-        ctx.fillText('0%', x0, c.height - 4);
-        ctx.fillText('50%', x0 + w/2, c.height - 4);
-        ctx.fillText('100%', x0 + w, c.height - 4);
-        ctx.textAlign = 'left';
       }
+      return dp[m][n];
+    }
 
-      function renderAll() {
-        const rows = sortedRows();
-        renderTable();
-        drawPie(rows);
-        drawBar(rows);
-        drawStack(rows);
-        renderLegend(rows);
-      }
+    function renderSuggestions(rows, totalWords) {
+      const box = $('suggestionsBox');
+      const list = $('suggestionsList');
+      const enabledEl = $('enableSuggestions');
 
-      // ---------- CSV ----------
-      function toCSV(rows) {
-        const header = 'Speaker,Words,Percent';
-        const lines = rows.map(r => {
-          const safe = '"' + String(r.name).replace(/"/g, '""') + '"';
-          return `${safe},${r.words},${r.pct.toFixed(1)}`;
-        });
-        return [header, ...lines].join('\n');
-      }
+      if (!box || !list) return;
 
-      function download(filename, text) {
-        const blob = new Blob([text], { type: 'text/csv;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-      }
+      const enabled = enabledEl ? enabledEl.checked : true;
+      list.innerHTML = '';
 
-      // ---------- Wire up UI ----------
-      const analyzeBtn = $('analyzeBtn');
-      const clearBtn = $('clearBtn');
-      const resetData = $('resetData');
-      const sortName = $('sortName');
-      const sortWords = $('sortWords');
-      const sortPct = $('sortPct');
-      const dirBtn = $('dirBtn');
-      const downloadCsv = $('downloadCsv');
-      const copyCsv = $('copyCsv');
-
-      if (!analyzeBtn) {
-        // If this happens, HTML ids were changed and JS can't find them.
-        console.error('Missing #analyzeBtn. Check your HTML ids.');
+      if (!enabled) {
+        const li = document.createElement('li');
+        li.textContent = 'Suggestions are turned off.';
+        list.appendChild(li);
         return;
       }
 
-      analyzeBtn.addEventListener('click', () => {
-        try {
-          const opts = {
-            ignoreBrackets: $('ignoreBrackets')?.checked ?? true,
-            caseSensitive: $('caseSensitive')?.checked ?? false,
-            mergeTiny: $('mergeTiny')?.checked ?? true
-          };
-          const text = $('script')?.value ?? '';
-          const result = parseScript(text, opts);
+      if (!rows || rows.length === 0 || totalWords <= 0) {
+        const li = document.createElement('li');
+        li.textContent = 'Paste a script and click Analyze to get suggestions.';
+        list.appendChild(li);
+        return;
+      }
 
-          state.rows = result.rows;
-          state.totalWords = result.totalWords;
-          state.ignoredCount = result.ignoredCount;
-          state.mergedIntoOther = result.mergedIntoOther;
+      // Heuristics
+      const DOMINANT_PCT = 35;   // above this is dominating
+      const LOW_PCT = 5;         // below this is low
+      const IDEAL_MAX = 30;      // good upper target
+      const IDEAL_MIN = 8;       // good lower target
 
-          // Default sort: words desc
-          state.sortKey = state.sortKey || 'words';
-          state.sortDir = state.sortDir || 'desc';
+      const sorted = [...rows].sort((a, b) => b.pct - a.pct);
+      const top = sorted[0];
 
-          renderAll();
+      // Dominant speaker message
+      if (top && top.pct >= DOMINANT_PCT && top.name !== 'Other') {
+        const suggestedMovePct = Math.max(0, top.pct - IDEAL_MAX);
+        const suggestedMoveWords = Math.round((suggestedMovePct / 100) * totalWords);
+        const li = document.createElement('li');
+        li.textContent = `${top.name} is speaking a lot (${top.pct.toFixed(1)}%). Consider moving about ${Math.max(10, suggestedMoveWords)} words to other speakers to balance.`;
+        list.appendChild(li);
+      }
 
-          if (state.totalWords === 0) {
-            showToast('No spoken words found. Check formatting: "Name: dialogue"', true);
-          } else {
-            showToast('Analyzed!');
-          }
-        } catch (e) {
-          console.error(e);
-          showToast('Error analyzing. Open Console for details.', true);
+      // Low speakers message
+      const low = rows.filter(r => r.name !== 'Other' && r.pct > 0 && r.pct < LOW_PCT);
+      if (low.length > 0) {
+        const li = document.createElement('li');
+        const names = low.map(r => `${r.name} (${r.pct.toFixed(1)}%)`).join(', ');
+        li.textContent = `Some speakers are very low: ${names}. Consider giving each ~10–40 more words (or merging lines) so everyone participates.`;
+        list.appendChild(li);
+      }
+
+      // Balance check: are most in an "ideal band"?
+      const nonOther = rows.filter(r => r.name !== 'Other');
+      const inBand = nonOther.filter(r => r.pct >= IDEAL_MIN && r.pct <= IDEAL_MAX);
+      if (nonOther.length >= 3) {
+        const ratio = inBand.length / nonOther.length;
+        const li = document.createElement('li');
+        if (ratio >= 0.6) {
+          li.textContent = `Nice balance: ${inBand.length}/${nonOther.length} speakers are between ${IDEAL_MIN}% and ${IDEAL_MAX}%.`;
+        } else {
+          li.textContent = `Balance tip: try to get more speakers between ${IDEAL_MIN}% and ${IDEAL_MAX}% for a more even presentation.`;
         }
+        list.appendChild(li);
+      }
+
+      // Possible name mismatch detection (similar names)
+      const names = nonOther.map(r => r.name);
+      const pairs = [];
+      for (let i = 0; i < names.length; i++) {
+        for (let j = i + 1; j < names.length; j++) {
+          const a = names[i], b = names[j];
+          const d = levenshtein(a, b);
+          const maxLen = Math.max(a.length, b.length);
+          if (maxLen >= 4 && d > 0 && d <= 2) {
+            pairs.push([a, b, d]);
+          }
+        }
+      }
+      if (pairs.length > 0) {
+        const li = document.createElement('li');
+        const show = pairs.slice(0, 3).map(p => `${p[0]} vs ${p[1]}`).join('; ');
+        li.textContent = `Possible name mismatches detected: ${show}. If these are the same person, make the spelling consistent.`;
+        list.appendChild(li);
+      }
+
+      // If nothing triggered
+      if (list.children.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = 'No major issues detected. Looks good!';
+        list.appendChild(li);
+      }
+    }
+
+    // ---------- Rendering ----------
+    let state = {
+      rows: [],
+      totalWords: 0,
+      ignoredCount: 0,
+      sortKey: 'words',
+      sortDir: 'desc'
+    };
+
+    function sortedRows() {
+      const mult = state.sortDir === 'asc' ? 1 : -1;
+      const rows = [...state.rows];
+      rows.sort((a, b) => {
+        if (state.sortKey === 'name') return a.name.localeCompare(b.name) * mult;
+        if (state.sortKey === 'pct') return (a.pct - b.pct) * mult;
+        return (a.words - b.words) * mult;
       });
+      return rows;
+    }
 
-      clearBtn?.addEventListener('click', () => {
-        const ta = $('script');
-        if (ta) ta.value = '';
-        showToast('Cleared');
+    function renderTable() {
+      const body = $('tbl').querySelector('tbody');
+      body.innerHTML = '';
+      const rows = sortedRows();
+
+      for (const r of rows) {
+        const tr = document.createElement('tr');
+
+        const tdName = document.createElement('td');
+        tdName.className = 'nameCell';
+        tdName.textContent = r.name;
+
+        const tdW = document.createElement('td');
+        tdW.className = 'right';
+        tdW.textContent = String(r.words);
+
+        const tdP = document.createElement('td');
+        tdP.className = 'right';
+        tdP.textContent = `${r.pct.toFixed(1)}%`;
+
+        tr.appendChild(tdName);
+        tr.appendChild(tdW);
+        tr.appendChild(tdP);
+        body.appendChild(tr);
+      }
+
+      $('totalWords').textContent = String(state.totalWords);
+      $('speakerCount').textContent = String(state.rows.length);
+      $('ignoredCount').textContent = String(state.ignoredCount);
+    }
+
+    function renderLegend(rows) {
+      const el = $('legend');
+      el.innerHTML = '';
+      for (const r of rows) {
+        const key = document.createElement('div');
+        key.className = 'key';
+        const sw = document.createElement('span');
+        sw.className = 'swatch';
+        sw.style.background = hashColor(r.name);
+        key.appendChild(sw);
+        const label = document.createElement('span');
+        label.textContent = `${r.name} (${r.pct.toFixed(1)}%)`;
+        key.appendChild(label);
+        el.appendChild(key);
+      }
+    }
+
+    function clearCanvas(ctx, canvas) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#0b1020';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function drawPie(rows) {
+      const c = $('pie');
+      const ctx = c.getContext('2d');
+      clearCanvas(ctx, c);
+
+      const cx = c.width * 0.36;
+      const cy = c.height * 0.5;
+      const r = Math.min(c.width, c.height) * 0.34;
+
+      const total = rows.reduce((a, r) => a + r.words, 0);
+      let start = -Math.PI / 2;
+
+      if (total <= 0) {
+        ctx.fillStyle = 'rgba(255,255,255,.15)';
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,.6)';
+        ctx.font = '14px system-ui';
+        ctx.fillText('Paste a script and click Analyze', cx - r, cy);
+        return;
+      }
+
+      for (const row of rows) {
+        const frac = row.words / total;
+        const end = start + frac * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, start, end);
+        ctx.closePath();
+        ctx.fillStyle = hashColor(row.name);
+        ctx.fill();
+        start = end;
+      }
+
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.beginPath(); ctx.arc(cx, cy, r * 0.55, 0, Math.PI * 2); ctx.fill();
+      ctx.globalCompositeOperation = 'source-over';
+
+      ctx.fillStyle = 'rgba(230,232,239,.9)';
+      ctx.font = '600 16px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText('Total', cx, cy - 6);
+      ctx.font = '600 18px system-ui';
+      ctx.fillText(String(total), cx, cy + 18);
+      ctx.textAlign = 'left';
+    }
+
+    function drawBar(rows) {
+      const c = $('bar');
+      const ctx = c.getContext('2d');
+      clearCanvas(ctx, c);
+
+      const padL = 46, padR = 14, padT = 18, padB = 28;
+      const w = c.width - padL - padR;
+      const h = c.height - padT - padB;
+
+      const top = rows.slice(0, 12);
+      const max = Math.max(1, ...top.map(r => r.words));
+
+      ctx.strokeStyle = 'rgba(255,255,255,.12)';
+      ctx.beginPath();
+      ctx.moveTo(padL, padT);
+      ctx.lineTo(padL, padT + h);
+      ctx.lineTo(padL + w, padT + h);
+      ctx.stroke();
+
+      const barGap = 8;
+      const barW = (w - barGap * (top.length - 1)) / Math.max(1, top.length);
+
+      ctx.font = '12px system-ui';
+      ctx.fillStyle = 'rgba(255,255,255,.65)';
+
+      for (let i = 0; i < top.length; i++) {
+        const r0 = top[i];
+        const bh = (r0.words / max) * (h - 10);
+        const x = padL + i * (barW + barGap);
+        const y = padT + h - bh;
+
+        ctx.fillStyle = hashColor(r0.name);
+        ctx.fillRect(x, y, barW, bh);
+
+        ctx.fillStyle = 'rgba(230,232,239,.9)';
+        ctx.textAlign = 'center';
+        ctx.fillText(String(r0.words), x + barW / 2, y - 4);
+
+        const label = r0.name.length > 10 ? r0.name.slice(0, 9) + '…' : r0.name;
+        ctx.fillStyle = 'rgba(255,255,255,.7)';
+        ctx.fillText(label, x + barW / 2, padT + h + 16);
+      }
+      ctx.textAlign = 'left';
+
+      if (rows.length > top.length) {
+        ctx.fillStyle = 'rgba(255,255,255,.55)';
+        ctx.font = '12px system-ui';
+        ctx.fillText(`Showing top ${top.length} of ${rows.length}`, padL, 14);
+      }
+    }
+
+    function drawStack(rows) {
+      const c = $('stack');
+      const ctx = c.getContext('2d');
+      clearCanvas(ctx, c);
+
+      const pad = 14;
+      const x0 = pad;
+      const y0 = pad;
+      const w = c.width - pad * 2;
+      const h = c.height - pad * 2;
+
+      const total = rows.reduce((a, r) => a + r.words, 0);
+      if (total <= 0) return;
+
+      let x = x0;
+      for (const r0 of rows) {
+        const segW = w * (r0.words / total);
+        ctx.fillStyle = hashColor(r0.name);
+        ctx.fillRect(x, y0, segW, h);
+        x += segW;
+      }
+
+      ctx.strokeStyle = 'rgba(255,255,255,.15)';
+      ctx.strokeRect(x0, y0, w, h);
+
+      ctx.fillStyle = 'rgba(255,255,255,.65)';
+      ctx.font = '12px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText('0%', x0, c.height - 4);
+      ctx.fillText('50%', x0 + w/2, c.height - 4);
+      ctx.fillText('100%', x0 + w, c.height - 4);
+      ctx.textAlign = 'left';
+    }
+
+    function renderAll() {
+      const rows = sortedRows();
+      renderTable();
+      drawPie(rows);
+      drawBar(rows);
+      drawStack(rows);
+      renderLegend(rows);
+      renderSuggestions(state.rows, state.totalWords);
+    }
+
+    // ---------- CSV ----------
+    function toCSV(rows) {
+      const header = 'Speaker,Words,Percent';
+      const lines = rows.map(r => {
+        const safe = '"' + String(r.name).replace(/"/g, '""') + '"';
+        return `${safe},${r.words},${r.pct.toFixed(1)}`;
       });
+      return [header, ...lines].join('\n');
+    }
 
-      resetData?.addEventListener('click', () => {
-        state = {
-          rows: [],
-          totalWords: 0,
-          ignoredCount: 0,
-          mergedIntoOther: 0,
-          sortKey: 'words',
-          sortDir: 'desc'
-        };
-        renderAll();
-        showToast('Reset');
-      });
+    function download(filename, text) {
+      const blob = new Blob([text], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
 
-      sortName?.addEventListener('click', () => { state.sortKey = 'name'; renderAll(); });
-      sortWords?.addEventListener('click', () => { state.sortKey = 'words'; renderAll(); });
-      sortPct?.addEventListener('click', () => { state.sortKey = 'pct'; renderAll(); });
+    // ---------- Events (robust: ensures button works even if script is moved) ----------
+    function wireEvents() {
+      const analyzeBtn = $('analyzeBtn');
+      const clearBtn = $('clearBtn');
+      const resetBtn = $('resetData');
 
-      dirBtn?.addEventListener('click', () => {
+      if (analyzeBtn) {
+        analyzeBtn.addEventListener('click', () => {
+          const opts = {
+            ignoreBrackets: $('ignoreBrackets').checked,
+            mergeSame: $('mergeSame').checked,
+            caseSensitive: $('caseSensitive').checked
+          };
+          const { rows, totalWords, ignoredCount } = parseScript($('script').value, opts);
+          state.rows = rows;
+          state.totalWords = totalWords;
+          state.ignoredCount = ignoredCount;
+          renderAll();
+        });
+      }
+
+      if (clearBtn) {
+        clearBtn.addEventListener('click', () => { $('script').value = ''; });
+      }
+
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          state = { rows: [], totalWords: 0, ignoredCount: 0, sortKey: 'words', sortDir: 'desc' };
+          renderAll();
+        });
+      }
+
+      $('sortName').addEventListener('click', () => { state.sortKey = 'name'; renderAll(); });
+      $('sortWords').addEventListener('click', () => { state.sortKey = 'words'; renderAll(); });
+      $('sortPct').addEventListener('click', () => { state.sortKey = 'pct'; renderAll(); });
+
+      $('dirBtn').addEventListener('click', () => {
         state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
-        dirBtn.textContent = state.sortDir === 'asc' ? 'Asc' : 'Desc';
+        $('dirBtn').textContent = state.sortDir === 'asc' ? 'Asc' : 'Desc';
         renderAll();
       });
 
-      downloadCsv?.addEventListener('click', () => {
+      $('downloadCsv').addEventListener('click', () => {
         const rows = sortedRows();
         download('speaker_percentages.csv', toCSV(rows));
       });
 
-      copyCsv?.addEventListener('click', async () => {
+      $('copyCsv').addEventListener('click', async () => {
         const rows = sortedRows();
         const csv = toCSV(rows);
         try {
           await navigator.clipboard.writeText(csv);
-          const old = copyCsv.textContent;
-          copyCsv.textContent = 'Copied!';
-          setTimeout(() => copyCsv.textContent = old || 'Copy CSV', 900);
+          $('copyCsv').textContent = 'Copied!';
+          setTimeout(() => $('copyCsv').textContent = 'Copy CSV', 900);
         } catch {
-          // fallback
           const ta = document.createElement('textarea');
           ta.value = csv;
           document.body.appendChild(ta);
           ta.select();
           document.execCommand('copy');
           ta.remove();
-          const old = copyCsv.textContent;
-          copyCsv.textContent = 'Copied!';
-          setTimeout(() => copyCsv.textContent = old || 'Copy CSV', 900);
+          $('copyCsv').textContent = 'Copied!';
+          setTimeout(() => $('copyCsv').textContent = 'Copy CSV', 900);
         }
       });
 
-      // Initial render
+      const enableSug = $('enableSuggestions');
+      if (enableSug) {
+        enableSug.addEventListener('change', () => renderSuggestions(state.rows, state.totalWords));
+      }
+    }
+
+    // Make sure DOM is ready before wiring events (prevents "button does nothing" issues)
+    document.addEventListener('DOMContentLoaded', () => {
+      wireEvents();
       renderAll();
-      showToast('Ready. Paste your script and click Analyze.');
     });
   </script>
 </body>

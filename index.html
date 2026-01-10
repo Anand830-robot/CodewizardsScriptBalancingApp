@@ -7,8 +7,7 @@
   <style>
     :root{
       --bg:#0b1020;--card:#121a33;--muted:#98a2b3;--text:#e6e8ef;--line:#243053;
-      --accent:#7c9cff;--good:#2dd4bf;--warn:#fbbf24;--bad:#fb7185;--chip:#0b1020;
-      --chip2:#0f1630;
+      --accent:#7c9cff;--good:#2dd4bf;--warn:#fbbf24;--bad:#fb7185;
     }
     *{box-sizing:border-box}
     body{
@@ -18,48 +17,50 @@
       font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
     }
     a{color:var(--accent)}
-    .wrap{max-width:1180px;margin:0 auto;padding:22px;}
+    .wrap{max-width:1100px;margin:0 auto;padding:22px;}
     h1{margin:0 0 6px;font-size:26px;letter-spacing:.2px}
     .sub{color:var(--muted);margin:0 0 18px}
     .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
-    @media (max-width: 980px){.grid{grid-template-columns:1fr}}
+    @media (max-width: 900px){.grid{grid-template-columns:1fr}}
     .card{
       background:rgba(18,26,51,.92);
       border:1px solid rgba(36,48,83,.9);
       border-radius:16px;
       box-shadow:0 10px 30px rgba(0,0,0,.35);
-      padding:14px
+      padding:14px;
     }
     .card h2{margin:0 0 10px;font-size:16px;color:#d7dcff}
     textarea{
       width:100%;
-      min-height:210px;
+      min-height:140px;     /* smaller viewer input */
+      max-height:220px;
       resize:vertical;
-      background:#0b1020;color:var(--text);
+      overflow:auto;
+      background:#0b1020;
+      color:var(--text);
       border:1px solid var(--line);
-      border-radius:12px;padding:12px;
+      border-radius:12px;
+      padding:12px;
       font:13px/1.4 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
-      outline:none
+      outline:none;
     }
-    textarea:focus,input:focus,select:focus{
-      border-color:rgba(124,156,255,.9);
-      box-shadow:0 0 0 3px rgba(124,156,255,.18)
-    }
+    textarea:focus,input:focus{border-color:rgba(124,156,255,.9);box-shadow:0 0 0 3px rgba(124,156,255,.18)}
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .btn{
-      appearance:none;border:1px solid var(--line);
-      background:#0b1020;color:var(--text);
-      padding:9px 12px;border-radius:12px;cursor:pointer
+      appearance:none;
+      border:1px solid var(--line);
+      background:#0b1020;
+      color:var(--text);
+      padding:9px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      pointer-events:auto;
+      user-select:none;
     }
     .btn:hover{border-color:rgba(124,156,255,.7)}
     .btn.primary{background:rgba(124,156,255,.18);border-color:rgba(124,156,255,.45)}
     .btn.danger{background:rgba(251,113,133,.12);border-color:rgba(251,113,133,.35)}
-    .btn.good{background:rgba(45,212,191,.12);border-color:rgba(45,212,191,.35)}
-    .pill{
-      display:inline-flex;gap:8px;align-items:center;
-      padding:8px 10px;border:1px solid var(--line);
-      border-radius:999px;background:#0b1020;color:var(--muted)
-    }
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:999px;background:#0b1020;color:var(--muted)}
     .pill b{color:var(--text)}
     .mini{font-size:12px;color:var(--muted)}
     table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:12px}
@@ -70,12 +71,14 @@
     .nameCell{font-weight:600}
     .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
     .controls .left{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    input[type="text"],input[type="number"],select{
+    input[type="number"]{
       background:#0b1020;color:var(--text);
       border:1px solid var(--line);
-      border-radius:12px;padding:9px 10px;outline:none
+      border-radius:12px;
+      padding:9px 10px;
+      outline:none;
+      width:120px;
     }
-    input[type="number"]{width:120px}
     .split{display:grid;grid-template-columns:1fr;gap:12px}
     canvas{width:100%;height:auto;background:#0b1020;border:1px solid var(--line);border-radius:12px}
     .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
@@ -84,89 +87,42 @@
     .footer{margin-top:12px;color:var(--muted);font-size:12px}
     code{background:rgba(255,255,255,.06);padding:2px 6px;border-radius:8px}
 
-    /* Script Viewer (Feature #8) */
-    .viewerWrap{
-      border:1px solid rgba(36,48,83,.7);
-      border-radius:12px;
-      overflow:hidden;
+    /* Script viewer */
+    .viewerWrap{margin-top:10px}
+    .viewerTitle{font-size:12px;color:var(--muted);margin:0 0 6px}
+    .scriptViewer{
+      height:160px;               /* small window */
+      overflow:auto;
       background:#0b1020;
-    }
-    .viewerHead{
-      display:flex;gap:10px;flex-wrap:wrap;align-items:center;
-      padding:10px 12px;
-      border-bottom:1px solid rgba(36,48,83,.7);
-      background:linear-gradient(180deg,rgba(18,26,51,.35),rgba(11,16,32,.2));
-    }
-    .chip{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:6px 10px;border-radius:999px;
-      border:1px solid rgba(36,48,83,.9);
-      background:var(--chip);color:var(--muted);
-      font-size:12px;
-    }
-    .chip b{color:var(--text)}
-    .viewer{
-      padding:10px 12px;
-      font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px;
+      font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      color:rgba(230,232,239,.92);
       white-space:pre-wrap;
       word-break:break-word;
     }
-    .spLine{display:block;padding:3px 6px;border-radius:10px;margin:2px 0}
-    .spLabel{font-weight:700}
-    .spText{color:rgba(230,232,239,.95)}
-    .spIgnored{opacity:.6}
-    .activeLine{
-      outline:2px solid rgba(124,156,255,.45);
-      background:rgba(124,156,255,.10);
-    }
-    .dimLine{opacity:.35}
-    .tagIgnored{
-      margin-left:10px;
-      font-size:11px;
-      padding:2px 8px;border-radius:999px;
-      border:1px solid rgba(36,48,83,.9);
-      background:rgba(255,255,255,.04);
-      color:rgba(255,255,255,.55);
-    }
 
-    /* Suggestions panel (Feature #4 + upgrade request) */
-    .suggestionList{margin:0;padding-left:18px}
-    .kpiRow{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 2px}
-    .kpi{
-      padding:8px 10px;border-radius:12px;
-      border:1px solid rgba(36,48,83,.9);
+    /* Suggestions panel */
+    .sugg{
       background:#0b1020;
-      color:var(--muted);
-      font-size:12px;
-      display:inline-flex;gap:8px;align-items:center;
-    }
-    .kpi b{color:var(--text)}
-    .flag{font-weight:700}
-    .flag.good{color:var(--good)}
-    .flag.warn{color:var(--warn)}
-    .flag.bad{color:var(--bad)}
-
-    /* Export outputs (Feature #7) */
-    .outBox{
-      width:100%;
-      min-height:120px;
-      resize:vertical;
-      background:#0b1020;color:var(--text);
       border:1px solid var(--line);
-      border-radius:12px;padding:10px;
-      font:12.5px/1.45 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
-      outline:none
+      border-radius:12px;
+      padding:10px;
     }
-    .twoCol{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media (max-width: 980px){.twoCol{grid-template-columns:1fr}}
+    .sugg ul{margin:0;padding-left:18px}
+    .sugg li{margin:6px 0;color:rgba(230,232,239,.9)}
+    .tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+    .dot{width:8px;height:8px;border-radius:999px;background:rgba(124,156,255,.9);display:inline-block}
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <h1>Speaker Percentage Calculator</h1>
     <p class="sub">
-      Paste your script (format: <code>Name:</code> dialogue). The app counts words per speaker and calculates percentages (rounded to 0.1%).
-      Click a speaker in the results table to highlight their lines.
+      Paste your script (format: <code>Name:</code> dialogue). The app counts words per speaker and calculates percentages.
+      Lines that start with <code>Slide</code> are ignored. Speakers below the threshold are grouped into <code>Other</code>.
     </p>
 
     <div class="grid">
@@ -178,17 +134,22 @@ Thomas: We are proud to present...
 Allison: Ugh, mapping this cave...
 Aailya: Yeah, this is really hard work."></textarea>
 
+        <div class="viewerWrap">
+          <div class="viewerTitle">Script Viewer (scrolls with your input)</div>
+          <pre id="scriptViewer" class="scriptViewer"></pre>
+        </div>
+
         <div class="row" style="margin-top:10px">
-          <button class="btn primary" id="analyzeBtn">Analyze script</button>
-          <button class="btn" id="clearBtn">Clear</button>
+          <button class="btn primary" id="analyzeBtn" type="button">Analyze script</button>
+          <button class="btn" id="clearBtn" type="button">Clear</button>
           <span class="pill"><span>Total words:</span> <b id="totalWords">0</b></span>
           <span class="pill"><span>Speakers:</span> <b id="speakerCount">0</b></span>
           <span class="pill"><span>Ignored lines:</span> <b id="ignoredCount">0</b></span>
         </div>
 
         <div class="footer">
-          Notes: lines starting with <code>[</code> or <code>(</code> are ignored as stage directions. Any line containing <code>Slide</code> is ignored.
-          Lines without <code>Name:</code> are treated as a continuation of the previous speaker.
+          Notes: lines starting with <code>[</code> or <code>(</code> are ignored as stage directions (optional).
+          Lines starting with <code>Slide</code> are ignored. Lines without <code>Name:</code> are treated as continuation of the previous speaker.
         </div>
       </div>
 
@@ -198,44 +159,46 @@ Aailya: Yeah, this is really hard work."></textarea>
           <label class="mini"><input type="checkbox" id="ignoreBrackets" checked /> Ignore bracket/parenthesis stage directions</label>
           <label class="mini"><input type="checkbox" id="caseSensitive" /> Case-sensitive names (normally OFF)</label>
 
-          <div class="row">
-            <label class="mini" style="display:flex;align-items:center;gap:8px">
-              <input type="checkbox" id="groupSmall" checked />
-              Group speakers under
-            </label>
-            <input type="number" id="smallPct" min="0" step="0.1" value="1.0" />
-            <span class="mini">% into “Other”</span>
+          <div class="row" style="align-items:center;justify-content:space-between">
+            <span class="mini">Group speakers under (%):</span>
+            <input type="number" id="otherThreshold" min="0" max="50" step="0.1" value="1.0" />
           </div>
 
           <div class="controls">
             <div class="left">
               <span class="mini">Sort:</span>
-              <button class="btn" id="sortName">Name</button>
-              <button class="btn" id="sortWords">Words</button>
-              <button class="btn" id="sortPct">Percent</button>
+              <button class="btn" id="sortName" type="button">Name</button>
+              <button class="btn" id="sortWords" type="button">Words</button>
+              <button class="btn" id="sortPct" type="button">Percent</button>
             </div>
             <div class="left">
               <span class="mini">Direction:</span>
-              <button class="btn" id="dirBtn">Desc</button>
+              <button class="btn" id="dirBtn" type="button">Desc</button>
             </div>
           </div>
 
           <div class="row">
-            <button class="btn" id="downloadCsv">Download CSV</button>
-            <button class="btn" id="copyCsv">Copy CSV</button>
-            <button class="btn" id="downloadJson">Download JSON</button>
-            <button class="btn good" id="downloadPng">Download PNG report</button>
-            <button class="btn danger" id="resetData">Reset</button>
+            <button class="btn" id="downloadCsv" type="button">Download CSV</button>
+            <button class="btn" id="copyCsv" type="button">Copy CSV</button>
+            <button class="btn danger" id="resetData" type="button">Reset</button>
           </div>
 
-          <div class="mini">Exports: CSV (Speaker, Words, Percent), JSON (full analysis), PNG (charts + table + suggestions)</div>
+          <div class="mini">CSV columns: Speaker, Words, Percent</div>
+
+          <div class="sugg">
+            <div class="tag"><span class="dot"></span><b style="color:var(--text)">Script improvement suggestions</b></div>
+            <div class="mini" style="margin:6px 0 8px">These are based on your actual text (no templates).</div>
+            <ul id="suggestionsList">
+              <li>Paste a script and click <b>Analyze</b>.</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="grid" style="margin-top:16px">
       <div class="card">
-        <h2>Results table (click a row to highlight)</h2>
+        <h2>Results table</h2>
         <div style="overflow:auto;border-radius:12px;border:1px solid rgba(36,48,83,.7)">
           <table id="tbl">
             <thead>
@@ -249,8 +212,7 @@ Aailya: Yeah, this is really hard work."></textarea>
           </table>
         </div>
         <div class="mini" style="margin-top:8px">
-          Tip: If a name is misspelled (e.g., Aaliya vs Aailya), it will count separately unless you standardize names in your script.
-          If you click “Other”, it will highlight all speakers that were grouped.
+          Tip: If a name is misspelled in your script (e.g., Aaliya vs Aailya), it will count as two separate speakers.
         </div>
       </div>
 
@@ -274,1010 +236,570 @@ Aailya: Yeah, this is really hard work."></textarea>
       </div>
     </div>
 
-    <div class="grid" style="margin-top:16px">
-      <div class="card">
-        <h2>Script viewer (highlight + ignored lines)</h2>
-        <div class="viewerWrap">
-          <div class="viewerHead">
-            <span class="chip">Highlight: <b id="activeSpeakerLabel">None</b></span>
-            <button class="btn" id="clearHighlight">Clear highlight</button>
-            <span class="chip">Click a speaker row (or a line) to highlight</span>
-          </div>
-          <div id="viewer" class="viewer" aria-label="Script viewer"></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>Readability & pacing suggestions</h2>
-        <div class="kpiRow" id="kpis"></div>
-        <ul class="suggestionList" id="suggestions"></ul>
-
-        <div class="twoCol" style="margin-top:12px">
-          <div>
-            <div class="mini" style="margin:0 0 6px">Judge-friendly summary (copy/paste)</div>
-            <textarea class="outBox" id="summaryBox" readonly></textarea>
-            <div class="row" style="margin-top:8px">
-              <button class="btn" id="copySummary">Copy summary</button>
-            </div>
-          </div>
-          <div>
-            <div class="mini" style="margin:0 0 6px">Notes</div>
-            <div class="mini">
-              These suggestions are based on your *spoken lines only* (stage directions and slide headings are ignored).
-              If your script is very short, some metrics may be less meaningful.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div class="footer" style="margin-top:18px">
-      GitHub Pages reminder: this file should be named <code>index.html</code> in your repo root (or the configured Pages folder).
-      If the Analyze button stops working: make sure you didn’t accidentally remove the <code>&lt;script&gt;</code> section or break quotes/brackets.
+      GitHub Pages tip: this file must be named <code>index.html</code> in the Pages folder you configured.
     </div>
   </div>
 
   <script>
-    // ==========================================================
-    // Speaker Percentage Calculator
-    // Features added:
-    // (4) Readability & pacing checks + suggestions
-    // (7) Better exports: PNG report, JSON download, summary copy
-    // (8) Script viewer with click-to-highlight by speaker
-    // ==========================================================
+    // Wrap everything so buttons always work (even if this script loads before the DOM is ready)
+    window.addEventListener('DOMContentLoaded', () => {
+      // ---------- Helpers ----------
+      const $ = (id) => document.getElementById(id);
 
-    // ---------- Helpers ----------
-    const $ = (id) => document.getElementById(id);
-
-    function escapeHTML(s) {
-      return String(s)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#39;");
-    }
-
-    function normalizeName(name, caseSensitive) {
-      const n = (name || "").trim();
-      if (!n) return "";
-      if (caseSensitive) return n;
-      // Capitalize first char, keep rest as-is (so "McDonald" stays "McDonald" if already correct)
-      return n[0].toUpperCase() + n.slice(1);
-    }
-
-    function countWords(text) {
-      // "don't" counts as 1
-      const m = (text || "").match(/[A-Za-z0-9]+(?:'[A-Za-z0-9]+)*/g);
-      return m ? m.length : 0;
-    }
-
-    function tokenizeWords(text) {
-      return (text || "").match(/[A-Za-z0-9]+(?:'[A-Za-z0-9]+)*/g) || [];
-    }
-
-    function round1(x) { return Math.round(x * 10) / 10; }
-
-    function hashColor(str) {
-      // deterministic, pleasant-ish HSL
-      let h = 2166136261;
-      for (let i = 0; i < str.length; i++) {
-        h ^= str.charCodeAt(i);
-        h = Math.imul(h, 16777619);
-      }
-      const hue = Math.abs(h) % 360;
-      return `hsl(${hue} 70% 60%)`;
-    }
-
-    function downloadBlob(filename, blob) {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    }
-
-    function downloadText(filename, text, mime = 'text/plain;charset=utf-8') {
-      downloadBlob(filename, new Blob([text], { type: mime }));
-    }
-
-    async function copyToClipboard(text) {
-      try {
-        await navigator.clipboard.writeText(text);
-        return true;
-      } catch {
-        // fallback
-        try {
-          const ta = document.createElement('textarea');
-          ta.value = text;
-          document.body.appendChild(ta);
-          ta.select();
-          document.execCommand('copy');
-          ta.remove();
-          return true;
-        } catch {
-          return false;
-        }
-      }
-    }
-
-    // ---------- Parsing ----------
-    // Output includes:
-    // - rowsRaw: per-speaker word totals (no "Other" grouping yet)
-    // - viewerLines: per-line objects for the script viewer (for highlighting and ignored lines)
-    function parseScript(rawText, opts) {
-      const text = rawText || "";
-      const lines = text.split(/\r?\n/);
-
-      // A speaker line must begin with CapitalLetter..., then colon
-      const nameLineRe = /^\s*([A-Z][A-Za-z0-9_\- ]{0,40}?)\s*:\s*(.*)\s*$/;
-
-      // Ignore any line that has "slide" anywhere (case-insensitive)
-      // (This avoids "Slide 8:" being treated as a speaker)
-      const slideAnywhereRe = /\bslide\b/i;
-
-      let currentSpeaker = null;
-      let ignoredCount = 0;
-
-      const bySpeaker = new Map();
-      const viewerLines = []; // { type: 'spoken'|'ignored', speaker, text, reason, words }
-
-      function addWords(speaker, txt) {
-        const w = countWords(txt);
-        if (!speaker) return w;
-        bySpeaker.set(speaker, (bySpeaker.get(speaker) || 0) + w);
-        return w;
+      function normalizeName(name, caseSensitive) {
+        const n = (name || "").trim();
+        if (!n) return "";
+        if (caseSensitive) return n;
+        // normalize: Title-case first letter, keep rest as-is
+        return n[0].toUpperCase() + n.slice(1);
       }
 
-      for (let i = 0; i < lines.length; i++) {
-        const original = lines[i];
-        const trimmedEnd = original.trimEnd();
-        const trimmed = trimmedEnd.trim();
+      function countWords(text) {
+        const m = (text || "").match(/[A-Za-z0-9]+(?:'[A-Za-z0-9]+)*/g);
+        return m ? m.length : 0;
+      }
 
-        if (trimmed.length === 0) continue;
-
-        // Ignore slide headings or slide mentions
-        if (slideAnywhereRe.test(trimmed)) {
-          ignoredCount++;
-          viewerLines.push({ type: 'ignored', speaker: null, text: trimmedEnd, reason: 'Slide line', words: 0 });
-          continue;
+      function hashColor(str) {
+        let h = 2166136261;
+        for (let i = 0; i < str.length; i++) {
+          h ^= str.charCodeAt(i);
+          h = Math.imul(h, 16777619);
         }
+        const hue = Math.abs(h) % 360;
+        return `hsl(${hue} 70% 60%)`;
+      }
 
-        // Ignore stage directions: [ ... ] or ( ... )
-        if (opts.ignoreBrackets) {
-          if (trimmed.startsWith('[') || trimmed.startsWith('(')) {
-            ignoredCount++;
-            viewerLines.push({ type: 'ignored', speaker: null, text: trimmedEnd, reason: 'Stage direction', words: 0 });
-            continue;
-          }
-        }
+      function round1(x) {
+        return Math.round(x * 10) / 10;
+      }
 
-        const m = trimmedEnd.match(nameLineRe);
-        if (m) {
-          const nm = normalizeName(m[1] || "", opts.caseSensitive);
+      function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
 
-          // extra safety: if "speaker name" includes "slide", ignore
-          if (slideAnywhereRe.test(nm)) {
-            ignoredCount++;
-            currentSpeaker = null;
-            viewerLines.push({ type: 'ignored', speaker: null, text: trimmedEnd, reason: 'Slide-like name', words: 0 });
-            continue;
+      // ---------- Script Viewer (smaller window + synced scroll) ----------
+      function updateViewerText() {
+        const viewer = $('scriptViewer');
+        if (!viewer) return;
+        viewer.textContent = $('script').value || '';
+      }
+
+      function syncViewerScroll() {
+        const ta = $('script');
+        const viewer = $('scriptViewer');
+        if (!ta || !viewer) return;
+
+        const taScrollable = ta.scrollHeight - ta.clientHeight;
+        const taPct = taScrollable > 0 ? (ta.scrollTop / taScrollable) : 0;
+
+        const vScrollable = viewer.scrollHeight - viewer.clientHeight;
+        viewer.scrollTop = taPct * Math.max(0, vScrollable);
+      }
+
+      $('script').addEventListener('input', () => {
+        updateViewerText();
+        syncViewerScroll();
+      });
+
+      $('script').addEventListener('scroll', () => {
+        syncViewerScroll();
+      });
+
+      // ---------- Parsing ----------
+      function parseScript(text, opts) {
+        const lines = (text || "").split(/\r?\n/);
+        const blocks = []; // {name, text}
+        let current = null;
+        let ignored = 0;
+
+        // Name must start with a capital letter and end with a colon.
+        const nameLineRe = /^\s*([A-Z][A-Za-z0-9_\- ]{0,40}?)\s*:\s*(.*)\s*$/;
+
+        // Ignore any line that starts with "Slide" (case-insensitive)
+        const slideLineRe = /^\s*slide\b/i;
+
+        for (const raw of lines) {
+          const line = raw.trimEnd();
+          const trimmed = line.trim();
+          if (trimmed.length === 0) continue;
+
+          // Ignore slide headings like "Slide 8:" or "Slide 10 - ..."
+          if (slideLineRe.test(trimmed)) { ignored++; continue; }
+
+          // Ignore stage directions like [High five] or (points to...)
+          if (opts.ignoreBrackets) {
+            if (trimmed.startsWith('[') || trimmed.startsWith('(')) { ignored++; continue; }
           }
 
-          const txt = (m[2] || "").trim();
-          currentSpeaker = nm;
+          const m = line.match(nameLineRe);
+          if (m) {
+            const nmRaw = m[1] || "";
+            const nm = normalizeName(nmRaw, opts.caseSensitive);
 
-          const w = addWords(currentSpeaker, txt);
-          viewerLines.push({ type: 'spoken', speaker: currentSpeaker, text: txt, reason: null, words: w, rawLine: trimmedEnd });
-        } else {
-          // Continuation line: counts as current speaker if exists
-          if (currentSpeaker) {
-            const w = addWords(currentSpeaker, trimmed);
-            viewerLines.push({ type: 'spoken', speaker: currentSpeaker, text: trimmed, reason: 'Continuation', words: w, rawLine: trimmedEnd });
+            // Safety: if a "speaker name" contains the word "slide", ignore it
+            if (/\bslide\b/i.test(nm)) { ignored++; current = null; continue; }
+
+            const txt = (m[2] || "").trim();
+            current = { name: nm, text: txt };
+            blocks.push(current);
           } else {
-            ignoredCount++;
-            viewerLines.push({ type: 'ignored', speaker: null, text: trimmedEnd, reason: 'No speaker yet', words: 0 });
+            // Continuation line: attribute to the last speaker if any; otherwise ignore
+            if (current) {
+              if (slideLineRe.test(trimmed)) { ignored++; continue; }
+              current.text = (current.text ? current.text + " " : "") + trimmed;
+            } else {
+              ignored++;
+            }
           }
         }
+
+        // Aggregate speaker word counts
+        const bySpeaker = new Map();
+        for (const b of blocks) {
+          const w = countWords(b.text);
+          bySpeaker.set(b.name, (bySpeaker.get(b.name) || 0) + w);
+        }
+
+        let rows = [...bySpeaker.entries()]
+          .map(([name, words]) => ({ name, words }))
+          .filter(r => r.name.length > 0 && Number.isFinite(r.words) && r.words > 0);
+
+        const total = rows.reduce((acc, r) => acc + r.words, 0);
+
+        // Exact pct for grouping (not rounded yet)
+        rows = rows.map(r => ({
+          ...r,
+          pctExact: total > 0 ? (r.words / total) * 100 : 0
+        }));
+
+        return { rows, totalWords: total, ignoredCount: ignored };
       }
 
-      // Build raw rows
-      const rowsRaw = [...bySpeaker.entries()]
-        .map(([name, words]) => ({ name, words }))
-        .filter(r => r.name && Number.isFinite(r.words));
+      function mergeUnderThreshold(rows, thresholdPct) {
+        const t = Math.max(0, Number(thresholdPct) || 0);
+        if (!rows.length) return rows;
 
-      const totalWords = rowsRaw.reduce((a, r) => a + r.words, 0);
+        const big = [];
+        let otherWords = 0;
 
-      // Percent (raw)
-      const rowsWithPctRaw = rowsRaw.map(r => ({
-        ...r,
-        pct: totalWords > 0 ? round1((r.words / totalWords) * 100) : 0
-      }));
+        for (const r of rows) {
+          if (r.pctExact < t) otherWords += r.words;
+          else big.push(r);
+        }
 
-      // Fix rounding drift (raw)
-      if (totalWords > 0 && rowsWithPctRaw.length > 0) {
-        const sum = rowsWithPctRaw.reduce((a, r) => a + r.pct, 0);
-        const drift = round1(100 - sum);
-        if (Math.abs(drift) >= 0.1) {
-          let idx = 0;
-          for (let i = 1; i < rowsWithPctRaw.length; i++) if (rowsWithPctRaw[i].words > rowsWithPctRaw[idx].words) idx = i;
-          rowsWithPctRaw[idx].pct = round1(rowsWithPctRaw[idx].pct + drift);
+        // If nothing fell under threshold, return unchanged
+        if (otherWords <= 0) return big;
+
+        // If everything fell under threshold, just return one "Other"
+        if (big.length === 0) {
+          return [{ name: 'Other', words: otherWords, pctExact: 100 }];
+        }
+
+        big.push({ name: 'Other', words: otherWords, pctExact: 0 }); // pctExact re-computed later
+        return big;
+      }
+
+      function computeDisplayPct(rows) {
+        const total = rows.reduce((a, r) => a + r.words, 0);
+        const withPct = rows.map(r => ({
+          name: r.name,
+          words: r.words,
+          pct: total > 0 ? round1((r.words / total) * 100) : 0
+        }));
+
+        // Fix rounding drift: adjust largest slice so sum=100.0
+        if (total > 0 && withPct.length > 0) {
+          const sum = withPct.reduce((a, r) => a + r.pct, 0);
+          const drift = round1(100 - sum);
+          if (Math.abs(drift) >= 0.1) {
+            let idx = 0;
+            for (let i = 1; i < withPct.length; i++) {
+              if (withPct[i].words > withPct[idx].words) idx = i;
+            }
+            withPct[idx].pct = round1(withPct[idx].pct + drift);
+          }
+        }
+        return { withPct, total };
+      }
+
+      // ---------- Rendering State ----------
+      let state = {
+        rows: [],
+        totalWords: 0,
+        ignoredCount: 0,
+        sortKey: 'words',
+        sortDir: 'desc'
+      };
+
+      function sortedRows() {
+        const mult = state.sortDir === 'asc' ? 1 : -1;
+        const rows = [...state.rows];
+        rows.sort((a, b) => {
+          if (state.sortKey === 'name') return a.name.localeCompare(b.name) * mult;
+          if (state.sortKey === 'pct') return (a.pct - b.pct) * mult;
+          return (a.words - b.words) * mult;
+        });
+        return rows;
+      }
+
+      function renderTable() {
+        const body = $('tbl').querySelector('tbody');
+        body.innerHTML = '';
+        const rows = sortedRows();
+
+        for (const r of rows) {
+          const tr = document.createElement('tr');
+
+          const tdName = document.createElement('td');
+          tdName.className = 'nameCell';
+          tdName.textContent = r.name;
+
+          const tdW = document.createElement('td');
+          tdW.className = 'right';
+          tdW.textContent = String(r.words);
+
+          const tdP = document.createElement('td');
+          tdP.className = 'right';
+          tdP.textContent = `${r.pct.toFixed(1)}%`;
+
+          tr.appendChild(tdName);
+          tr.appendChild(tdW);
+          tr.appendChild(tdP);
+          body.appendChild(tr);
+        }
+
+        $('totalWords').textContent = String(state.totalWords);
+        $('speakerCount').textContent = String(state.rows.length);
+        $('ignoredCount').textContent = String(state.ignoredCount);
+      }
+
+      function renderLegend(rows) {
+        const el = $('legend');
+        el.innerHTML = '';
+        for (const r of rows) {
+          const key = document.createElement('div');
+          key.className = 'key';
+          const sw = document.createElement('span');
+          sw.className = 'swatch';
+          sw.style.background = hashColor(r.name);
+          key.appendChild(sw);
+          const label = document.createElement('span');
+          label.textContent = `${r.name} (${r.pct.toFixed(1)}%)`;
+          key.appendChild(label);
+          el.appendChild(key);
         }
       }
 
-      return { rowsRaw: rowsWithPctRaw, totalWords, ignoredCount, viewerLines };
-    }
-
-    // ---------- "Other" grouping ----------
-    function applyOtherGrouping(rowsRaw, totalWords, enabled, thresholdPct) {
-      const t = Number.isFinite(thresholdPct) ? thresholdPct : 1.0;
-      if (!enabled || !rowsRaw.length || totalWords <= 0 || t <= 0) {
-        return { rows: rowsRaw, otherMembers: [] };
+      function clearCanvas(ctx, canvas) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#0b1020';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
 
-      const small = [];
-      const big = [];
+      function drawPie(rows) {
+        const c = $('pie');
+        const ctx = c.getContext('2d');
+        clearCanvas(ctx, c);
 
-      for (const r of rowsRaw) {
-        if (r.pct < t) small.push(r);
-        else big.push(r);
-      }
+        const cx = c.width * 0.36;
+        const cy = c.height * 0.5;
+        const r = Math.min(c.width, c.height) * 0.34;
 
-      if (small.length === 0) return { rows: rowsRaw, otherMembers: [] };
+        const total = rows.reduce((a, r) => a + r.words, 0);
+        let start = -Math.PI / 2;
 
-      const otherWords = small.reduce((a, r) => a + r.words, 0);
-      const otherPct = totalWords > 0 ? round1((otherWords / totalWords) * 100) : 0;
+        if (total <= 0) {
+          ctx.fillStyle = 'rgba(255,255,255,.15)';
+          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = 'rgba(255,255,255,.6)';
+          ctx.font = '14px system-ui';
+          ctx.fillText('Paste a script and click Analyze', cx - r, cy);
+          return;
+        }
 
-      const rows = [...big, { name: "Other", words: otherWords, pct: otherPct }];
+        for (const row of rows) {
+          const frac = row.words / total;
+          const end = start + frac * Math.PI * 2;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.arc(cx, cy, r, start, end);
+          ctx.closePath();
+          ctx.fillStyle = hashColor(row.name);
+          ctx.fill();
+          start = end;
+        }
 
-      // Fix drift again
-      const sum = rows.reduce((a, r) => a + r.pct, 0);
-      const drift = round1(100 - sum);
-      if (Math.abs(drift) >= 0.1) {
-        let idx = 0;
-        for (let i = 1; i < rows.length; i++) if (rows[i].words > rows[idx].words) idx = i;
-        rows[idx].pct = round1(rows[idx].pct + drift);
-      }
+        // donut hole
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath(); ctx.arc(cx, cy, r * 0.55, 0, Math.PI * 2); ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
 
-      return { rows, otherMembers: small.map(s => s.name) };
-    }
-
-    // ---------- Readability & pacing checks (Feature #4) ----------
-    function analyzeReadability(viewerLines) {
-      // Use spoken lines only
-      const spoken = viewerLines.filter(l => l.type === 'spoken' && l.speaker);
-      const text = spoken.map(l => l.text).join(' ').trim();
-
-      const words = tokenizeWords(text);
-      const totalWords = words.length;
-
-      // Sentence split (simple heuristic)
-      const sentences = text
-        .split(/(?<=[.!?])\s+/)
-        .map(s => s.trim())
-        .filter(Boolean);
-
-      const sentenceWordCounts = sentences.map(s => tokenizeWords(s).length).filter(n => n > 0);
-      const avgSentence = sentenceWordCounts.length ? (sentenceWordCounts.reduce((a,b)=>a+b,0) / sentenceWordCounts.length) : 0;
-
-      const longThreshold = 22; // long sentence threshold
-      const longSentences = sentenceWordCounts.filter(n => n >= longThreshold).length;
-      const longPct = sentenceWordCounts.length ? (longSentences / sentenceWordCounts.length) * 100 : 0;
-
-      // Consecutive long sentences
-      let maxLongStreak = 0;
-      let currentStreak = 0;
-      for (const n of sentenceWordCounts) {
-        if (n >= longThreshold) { currentStreak++; maxLongStreak = Math.max(maxLongStreak, currentStreak); }
-        else currentStreak = 0;
-      }
-
-      // Filler starter detection (first word of each spoken line)
-      const fillers = new Set([
-        "yeah","so","okay","well","um","uh","like","actually","basically","right","alright","great"
-      ]);
-
-      const starters = [];
-      for (const l of spoken) {
-        const w = tokenizeWords(l.text);
-        if (w.length) starters.push(w[0].toLowerCase());
-      }
-
-      const starterCounts = new Map();
-      for (const st of starters) {
-        if (!fillers.has(st)) continue;
-        starterCounts.set(st, (starterCounts.get(st) || 0) + 1);
-      }
-
-      const topFiller = [...starterCounts.entries()].sort((a,b)=>b[1]-a[1])[0] || null;
-
-      // Repeated words (simple)
-      const lowerWords = words.map(w => w.toLowerCase());
-      let repeatRuns = 0;
-      for (let i = 1; i < lowerWords.length; i++) {
-        if (lowerWords[i] === lowerWords[i-1]) repeatRuns++;
-      }
-
-      // Questions balance
-      const questionCount = (text.match(/\?/g) || []).length;
-
-      // Readability "flags"
-      const kpis = [];
-      const suggestions = [];
-
-      // KPI: Avg sentence length
-      kpis.push({
-        label: "Avg sentence length",
-        value: sentenceWordCounts.length ? `${avgSentence.toFixed(1)} words` : "N/A",
-        flag: sentenceWordCounts.length
-          ? (avgSentence <= 18 ? "good" : avgSentence <= 24 ? "warn" : "bad")
-          : "warn"
-      });
-
-      // KPI: Long sentence %
-      kpis.push({
-        label: `Long sentences (≥${longThreshold}w)`,
-        value: sentenceWordCounts.length ? `${longPct.toFixed(0)}%` : "N/A",
-        flag: sentenceWordCounts.length
-          ? (longPct <= 15 ? "good" : longPct <= 30 ? "warn" : "bad")
-          : "warn"
-      });
-
-      // KPI: Questions
-      kpis.push({
-        label: "Question marks",
-        value: String(questionCount),
-        flag: questionCount >= 2 ? "good" : questionCount === 1 ? "warn" : "warn"
-      });
-
-      // KPI: Total words (spoken)
-      kpis.push({
-        label: "Spoken words analyzed",
-        value: String(totalWords),
-        flag: totalWords >= 120 ? "good" : totalWords >= 60 ? "warn" : "warn"
-      });
-
-      // Suggestions based on metrics
-      if (sentenceWordCounts.length && avgSentence > 20) {
-        suggestions.push(`Try shortening some sentences. Your average sentence length is ${avgSentence.toFixed(1)} words. Breaking long sentences into two usually makes it sound more confident and easier to follow.`);
-      }
-      if (sentenceWordCounts.length && longPct > 20) {
-        suggestions.push(`You have a lot of long sentences (≥${longThreshold} words): ${longSentences}/${sentenceWordCounts.length}. Consider adding pauses, or splitting them into shorter lines.`);
-      }
-      if (maxLongStreak >= 2) {
-        suggestions.push(`There are ${maxLongStreak} long sentences in a row in at least one spot. Add a shorter “breath line” between them (a quick sentence or a handoff like “Here’s the key point.”).`);
-      }
-      if (topFiller && topFiller[1] >= 3) {
-        suggestions.push(`You start lines with “${topFiller[0]}” ${topFiller[1]} times. Swap some starters to sound stronger (e.g., “Here’s why…”, “The key is…”, “Our data shows…”, “Next…”).`);
-      }
-      if (repeatRuns >= 2) {
-        suggestions.push(`I noticed some repeated words back-to-back (${repeatRuns} times). Read it out loud once—those spots usually feel awkward and can be cleaned up quickly.`);
-      }
-      if (questionCount === 0 && totalWords > 0) {
-        suggestions.push(`Consider adding 1–2 “judge hook” questions to keep it engaging (e.g., “What if we could map caves without entering them?”).`);
-      }
-
-      // Style / clarity suggestions (general but useful)
-      suggestions.push(`Add more handoff lines between speakers (“Back to you, ___.” / “Now ___ will explain…”). It sounds smoother and helps judges follow the story.`);
-      suggestions.push(`When you mention numbers (views, points, seconds, cost), pause slightly after the number—judges remember metrics better when they’re isolated.`);
-      suggestions.push(`If a line feels heavy, try “Because → Therefore” phrasing: “Because X, therefore we did Y.” It makes your logic sound crisp.`);
-
-      // Provide a couple example rewrites for common weak starters
-      if (totalWords > 0) {
-        suggestions.push(`Quick strength upgrade: replace “So basically…” with “In summary…” or “The key takeaway is…”`);
-        suggestions.push(`Quick strength upgrade: replace “We started by…” with “First, we…” or “Our first step was…”`);
-      }
-
-      return { totalWords, sentences: sentenceWordCounts.length, avgSentence, longPct, questionCount, kpis, suggestions };
-    }
-
-    // ---------- Summary text (Feature #7) ----------
-    function buildSummary(state) {
-      const rows = sortedRows(state);
-      const top = rows.slice(0, Math.min(6, rows.length));
-      const topLine = top.map(r => `${r.name}: ${r.pct.toFixed(1)}% (${r.words}w)`).join(" | ");
-      const otherNote = state.otherMembers && state.otherMembers.length
-        ? `Other includes: ${state.otherMembers.join(", ")}`
-        : "";
-
-      const r = state.readability || {};
-      const paceLine = (r && r.sentences)
-        ? `Readability: avg sentence ${r.avgSentence.toFixed(1)}w; long-sentence rate ${r.longPct.toFixed(0)}%; questions ${r.questionCount}.`
-        : `Readability: not enough data yet.`;
-
-      return [
-        "Speaker Share Summary",
-        "---------------------",
-        `Total spoken words: ${state.totalWords}`,
-        `Speakers counted: ${state.rows.length}`,
-        topLine ? `Top speakers: ${topLine}` : "Top speakers: (none)",
-        otherNote ? otherNote : "",
-        paceLine,
-        "",
-        "Tip: Click a speaker row to highlight their lines in the Script Viewer."
-      ].filter(Boolean).join("\n");
-    }
-
-    // ---------- Charts + table render ----------
-    function clearCanvas(ctx, canvas) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#0b1020';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
-    function drawPie(rows) {
-      const c = $('pie');
-      const ctx = c.getContext('2d');
-      clearCanvas(ctx, c);
-
-      const cx = c.width * 0.36;
-      const cy = c.height * 0.5;
-      const r = Math.min(c.width, c.height) * 0.34;
-
-      const total = rows.reduce((a, r) => a + r.words, 0);
-      let start = -Math.PI / 2;
-
-      if (total <= 0) {
-        ctx.fillStyle = 'rgba(255,255,255,.15)';
-        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = 'rgba(255,255,255,.6)';
-        ctx.font = '14px system-ui';
-        ctx.fillText('Paste a script and click Analyze', cx - r, cy);
-        return;
-      }
-
-      for (const row of rows) {
-        const frac = row.words / total;
-        const end = start + frac * Math.PI * 2;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.arc(cx, cy, r, start, end);
-        ctx.closePath();
-        ctx.fillStyle = (row.name === "Other") ? 'hsl(0 0% 70%)' : hashColor(row.name);
-        ctx.fill();
-        start = end;
-      }
-
-      // donut hole
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.beginPath(); ctx.arc(cx, cy, r * 0.55, 0, Math.PI * 2); ctx.fill();
-      ctx.globalCompositeOperation = 'source-over';
-
-      // center text
-      ctx.fillStyle = 'rgba(230,232,239,.9)';
-      ctx.font = '600 16px system-ui';
-      ctx.textAlign = 'center';
-      ctx.fillText('Total', cx, cy - 6);
-      ctx.font = '600 18px system-ui';
-      ctx.fillText(String(total), cx, cy + 18);
-      ctx.textAlign = 'left';
-    }
-
-    function drawBar(rows) {
-      const c = $('bar');
-      const ctx = c.getContext('2d');
-      clearCanvas(ctx, c);
-
-      const padL = 46, padR = 14, padT = 18, padB = 28;
-      const w = c.width - padL - padR;
-      const h = c.height - padT - padB;
-
-      const top = rows.slice(0, 12);
-      const max = Math.max(1, ...top.map(r => r.words));
-
-      // axes
-      ctx.strokeStyle = 'rgba(255,255,255,.12)';
-      ctx.beginPath();
-      ctx.moveTo(padL, padT);
-      ctx.lineTo(padL, padT + h);
-      ctx.lineTo(padL + w, padT + h);
-      ctx.stroke();
-
-      const barGap = 8;
-      const barW = (w - barGap * (top.length - 1)) / Math.max(1, top.length);
-
-      ctx.font = '12px system-ui';
-
-      for (let i = 0; i < top.length; i++) {
-        const r0 = top[i];
-        const bh = (r0.words / max) * (h - 10);
-        const x = padL + i * (barW + barGap);
-        const y = padT + h - bh;
-
-        ctx.fillStyle = (r0.name === "Other") ? 'hsl(0 0% 70%)' : hashColor(r0.name);
-        ctx.fillRect(x, y, barW, bh);
-
-        // word label
+        // center text
         ctx.fillStyle = 'rgba(230,232,239,.9)';
+        ctx.font = '600 16px system-ui';
         ctx.textAlign = 'center';
-        ctx.fillText(String(r0.words), x + barW / 2, y - 4);
-
-        // name label
-        const label = r0.name.length > 10 ? r0.name.slice(0, 9) + '…' : r0.name;
-        ctx.fillStyle = 'rgba(255,255,255,.7)';
-        ctx.fillText(label, x + barW / 2, padT + h + 16);
-      }
-      ctx.textAlign = 'left';
-
-      if (rows.length > top.length) {
-        ctx.fillStyle = 'rgba(255,255,255,.55)';
-        ctx.font = '12px system-ui';
-        ctx.fillText(`Showing top ${top.length} of ${rows.length}`, padL, 14);
-      }
-    }
-
-    function drawStack(rows) {
-      const c = $('stack');
-      const ctx = c.getContext('2d');
-      clearCanvas(ctx, c);
-
-      const pad = 14;
-      const x0 = pad, y0 = pad;
-      const w = c.width - pad * 2;
-      const h = c.height - pad * 2;
-
-      const total = rows.reduce((a, r) => a + r.words, 0);
-      if (total <= 0) return;
-
-      let x = x0;
-      for (const r0 of rows) {
-        const segW = w * (r0.words / total);
-        ctx.fillStyle = (r0.name === "Other") ? 'hsl(0 0% 70%)' : hashColor(r0.name);
-        ctx.fillRect(x, y0, segW, h);
-        x += segW;
+        ctx.fillText('Total', cx, cy - 6);
+        ctx.font = '600 18px system-ui';
+        ctx.fillText(String(total), cx, cy + 18);
+        ctx.textAlign = 'left';
       }
 
-      // outline
-      ctx.strokeStyle = 'rgba(255,255,255,.15)';
-      ctx.strokeRect(x0, y0, w, h);
+      function drawBar(rows) {
+        const c = $('bar');
+        const ctx = c.getContext('2d');
+        clearCanvas(ctx, c);
 
-      // ticks
-      ctx.fillStyle = 'rgba(255,255,255,.65)';
-      ctx.font = '12px system-ui';
-      ctx.textAlign = 'center';
-      ctx.fillText('0%', x0, c.height - 4);
-      ctx.fillText('50%', x0 + w/2, c.height - 4);
-      ctx.fillText('100%', x0 + w, c.height - 4);
-      ctx.textAlign = 'left';
-    }
+        const padL = 46, padR = 14, padT = 18, padB = 28;
+        const w = c.width - padL - padR;
+        const h = c.height - padT - padB;
 
-    function renderLegend(rows) {
-      const el = $('legend');
-      el.innerHTML = '';
-      for (const r of rows) {
-        const key = document.createElement('div');
-        key.className = 'key';
-        const sw = document.createElement('span');
-        sw.className = 'swatch';
-        sw.style.background = (r.name === "Other") ? 'hsl(0 0% 70%)' : hashColor(r.name);
-        key.appendChild(sw);
-        const label = document.createElement('span');
-        label.textContent = `${r.name} (${r.pct.toFixed(1)}%)`;
-        key.appendChild(label);
-        el.appendChild(key);
-      }
-    }
+        const top = rows.slice(0, 12);
+        const max = Math.max(1, ...top.map(r => r.words));
 
-    // ---------- Script Viewer (Feature #8) ----------
-    function renderViewer(viewerLines, activeSet) {
-      const v = $('viewer');
-      const activeLabel = $('activeSpeakerLabel');
-
-      const activeNames = activeSet ? [...activeSet] : [];
-      activeLabel.textContent = activeNames.length ? (activeNames.length === 1 ? activeNames[0] : `${activeNames[0]} + ${activeNames.length-1}`) : "None";
-
-      const parts = [];
-      for (let i = 0; i < viewerLines.length; i++) {
-        const ln = viewerLines[i];
-        if (ln.type === 'ignored') {
-          parts.push(
-            `<span class="spLine spIgnored" data-idx="${i}" data-speaker="">` +
-              `${escapeHTML(ln.text)}` +
-              `<span class="tagIgnored">${escapeHTML(ln.reason || "Ignored")}</span>` +
-            `</span>`
-          );
-          continue;
-        }
-
-        const speaker = ln.speaker || "";
-        const isActive = activeSet && activeSet.size ? activeSet.has(speaker) : false;
-        const shouldDim = activeSet && activeSet.size ? !isActive : false;
-
-        const lineCls = [
-          "spLine",
-          isActive ? "activeLine" : "",
-          shouldDim ? "dimLine" : ""
-        ].filter(Boolean).join(" ");
-
-        const label = `${speaker}: `;
-        parts.push(
-          `<span class="${lineCls}" data-idx="${i}" data-speaker="${escapeHTML(speaker)}">` +
-            `<span class="spLabel">${escapeHTML(label)}</span>` +
-            `<span class="spText">${escapeHTML(ln.text || "")}</span>` +
-          `</span>`
-        );
-      }
-
-      v.innerHTML = parts.join("\n");
-
-      // Click on viewer line to highlight that speaker
-      v.querySelectorAll('.spLine').forEach(el => {
-        el.addEventListener('click', () => {
-          const sp = el.getAttribute('data-speaker') || "";
-          if (!sp) return;
-          setActiveSpeaker(sp);
-        });
-      });
-    }
-
-    // ---------- Table ----------
-    function renderTable(state) {
-      const body = $('tbl').querySelector('tbody');
-      body.innerHTML = '';
-      const rows = sortedRows(state);
-
-      for (const r of rows) {
-        const tr = document.createElement('tr');
-        tr.setAttribute('data-speaker', r.name);
-
-        const tdName = document.createElement('td');
-        tdName.className = 'nameCell';
-        tdName.textContent = r.name;
-
-        const tdW = document.createElement('td');
-        tdW.className = 'right';
-        tdW.textContent = String(r.words);
-
-        const tdP = document.createElement('td');
-        tdP.className = 'right';
-        tdP.textContent = `${r.pct.toFixed(1)}%`;
-
-        tr.appendChild(tdName);
-        tr.appendChild(tdW);
-        tr.appendChild(tdP);
-
-        // click-to-highlight speaker
-        tr.addEventListener('click', () => {
-          setActiveSpeaker(r.name);
-        });
-
-        body.appendChild(tr);
-      }
-
-      $('totalWords').textContent = String(state.totalWords);
-      $('speakerCount').textContent = String(state.rows.length);
-      $('ignoredCount').textContent = String(state.ignoredCount);
-    }
-
-    // ---------- Sorting ----------
-    function sortedRows(state) {
-      const mult = state.sortDir === 'asc' ? 1 : -1;
-      const rows = [...state.rows];
-      rows.sort((a, b) => {
-        if (state.sortKey === 'name') return a.name.localeCompare(b.name) * mult;
-        if (state.sortKey === 'pct') return (a.pct - b.pct) * mult;
-        return (a.words - b.words) * mult;
-      });
-      return rows;
-    }
-
-    // ---------- Suggestions Render ----------
-    function renderSuggestions(readability) {
-      const kpisEl = $('kpis');
-      const sugEl = $('suggestions');
-
-      kpisEl.innerHTML = '';
-      sugEl.innerHTML = '';
-
-      if (!readability || !readability.kpis) return;
-
-      for (const k of readability.kpis) {
-        const div = document.createElement('div');
-        div.className = 'kpi';
-        const flag = document.createElement('span');
-        flag.className = `flag ${k.flag}`;
-        flag.textContent = k.flag === 'good' ? 'Good' : k.flag === 'bad' ? 'Fix' : 'Watch';
-        const label = document.createElement('span');
-        label.textContent = k.label + ':';
-        const val = document.createElement('b');
-        val.textContent = k.value;
-        div.appendChild(flag);
-        div.appendChild(label);
-        div.appendChild(val);
-        kpisEl.appendChild(div);
-      }
-
-      for (const s of readability.suggestions || []) {
-        const li = document.createElement('li');
-        li.textContent = s;
-        sugEl.appendChild(li);
-      }
-    }
-
-    // ---------- CSV / JSON ----------
-    function toCSV(rows) {
-      const header = 'Speaker,Words,Percent';
-      const lines = rows.map(r => {
-        const safe = '"' + String(r.name).replace(/"/g, '""') + '"';
-        return `${safe},${r.words},${r.pct.toFixed(1)}`;
-      });
-      return [header, ...lines].join('\n');
-    }
-
-    // ---------- PNG Report Export (Feature #7) ----------
-    function renderTableToCanvas(ctx, rows, x, y, width) {
-      const rowH = 18;
-      const col1 = Math.floor(width * 0.56);
-      const col2 = Math.floor(width * 0.20);
-      const col3 = width - col1 - col2;
-
-      // header
-      ctx.fillStyle = "rgba(255,255,255,0.85)";
-      ctx.font = "bold 13px system-ui";
-      ctx.fillText("Speaker", x + 6, y + 14);
-      ctx.fillText("Words", x + col1 + 6, y + 14);
-      ctx.fillText("Percent", x + col1 + col2 + 6, y + 14);
-
-      // lines
-      ctx.strokeStyle = "rgba(255,255,255,0.12)";
-      ctx.beginPath();
-      ctx.moveTo(x, y + 18);
-      ctx.lineTo(x + width, y + 18);
-      ctx.stroke();
-
-      // rows
-      ctx.font = "12px system-ui";
-      let yy = y + 36;
-      const maxRows = Math.min(rows.length, 22);
-      for (let i = 0; i < maxRows; i++) {
-        const r = rows[i];
-        ctx.fillStyle = "rgba(230,232,239,0.92)";
-        ctx.fillText(String(r.name).slice(0, 28), x + 6, yy);
-
-        ctx.fillStyle = "rgba(230,232,239,0.92)";
-        ctx.fillText(String(r.words), x + col1 + 6, yy);
-
-        ctx.fillStyle = "rgba(230,232,239,0.92)";
-        ctx.fillText(`${r.pct.toFixed(1)}%`, x + col1 + col2 + 6, yy);
-
-        // row separator
-        ctx.strokeStyle = "rgba(255,255,255,0.08)";
+        // axes
+        ctx.strokeStyle = 'rgba(255,255,255,.12)';
         ctx.beginPath();
-        ctx.moveTo(x, yy + 6);
-        ctx.lineTo(x + width, yy + 6);
+        ctx.moveTo(padL, padT);
+        ctx.lineTo(padL, padT + h);
+        ctx.lineTo(padL + w, padT + h);
         ctx.stroke();
 
-        yy += rowH;
-      }
+        const barGap = 8;
+        const barW = (w - barGap * (top.length - 1)) / Math.max(1, top.length);
 
-      if (rows.length > maxRows) {
-        ctx.fillStyle = "rgba(255,255,255,0.65)";
-        ctx.fillText(`(Showing top ${maxRows} rows)`, x + 6, yy + 6);
-        yy += rowH;
-      }
+        ctx.font = '12px system-ui';
+        ctx.fillStyle = 'rgba(255,255,255,.65)';
 
-      return yy;
-    }
+        for (let i = 0; i < top.length; i++) {
+          const r0 = top[i];
+          const bh = (r0.words / max) * (h - 10);
+          const x = padL + i * (barW + barGap);
+          const y = padT + h - bh;
 
-    function exportPNGReport(state) {
-      const rows = sortedRows(state);
+          ctx.fillStyle = hashColor(r0.name);
+          ctx.fillRect(x, y, barW, bh);
 
-      const pie = $('pie');
-      const bar = $('bar');
-      const stack = $('stack');
+          ctx.fillStyle = 'rgba(230,232,239,.9)';
+          ctx.textAlign = 'center';
+          ctx.fillText(String(r0.words), x + barW / 2, y - 4);
 
-      const W = 1200;
-      const padding = 24;
-
-      // height estimate
-      const H = 900;
-
-      const out = document.createElement('canvas');
-      out.width = W;
-      out.height = H;
-      const ctx = out.getContext('2d');
-
-      // background
-      ctx.fillStyle = "#0b1020";
-      ctx.fillRect(0, 0, W, H);
-
-      // title
-      ctx.fillStyle = "rgba(230,232,239,0.95)";
-      ctx.font = "bold 22px system-ui";
-      ctx.fillText("Speaker Percentage Report", padding, 34);
-
-      ctx.fillStyle = "rgba(255,255,255,0.65)";
-      ctx.font = "13px system-ui";
-      ctx.fillText(`Total spoken words: ${state.totalWords}  •  Speakers: ${state.rows.length}  •  Ignored lines: ${state.ignoredCount}`, padding, 58);
-
-      // charts
-      // draw pie left, bar right, stack below
-      const chartY = 80;
-      const pieW = 560, pieH = 340;
-      const barW = 560, barH = 340;
-
-      ctx.drawImage(pie, padding, chartY, pieW, pieH);
-      ctx.drawImage(bar, padding + pieW + 24, chartY, barW, barH);
-
-      ctx.drawImage(stack, padding, chartY + pieH + 18, 1144, 130);
-
-      // table
-      const tableY = chartY + pieH + 18 + 150;
-      ctx.fillStyle = "rgba(255,255,255,0.10)";
-      ctx.fillRect(padding, tableY - 18, 1144, 430);
-
-      const endY = renderTableToCanvas(ctx, rows, padding, tableY, 1144);
-
-      // suggestions footer
-      const r = state.readability || null;
-      const sY = Math.min(endY + 12, H - 140);
-
-      ctx.fillStyle = "rgba(230,232,239,0.95)";
-      ctx.font = "bold 14px system-ui";
-      ctx.fillText("Readability & Pacing Notes", padding, sY);
-
-      ctx.fillStyle = "rgba(255,255,255,0.70)";
-      ctx.font = "12.5px system-ui";
-
-      const notes = [];
-      if (r && r.sentences) {
-        notes.push(`Avg sentence length: ${r.avgSentence.toFixed(1)} words.`);
-        notes.push(`Long-sentence rate: ${r.longPct.toFixed(0)}%.`);
-        notes.push(`Questions: ${r.questionCount}.`);
-      } else {
-        notes.push("Not enough spoken text to compute readability metrics.");
-      }
-      if (state.otherMembers && state.otherMembers.length) {
-        notes.push(`Other includes: ${state.otherMembers.join(", ")}`);
-      }
-
-      let yy = sY + 18;
-      for (const n of notes.slice(0, 5)) {
-        ctx.fillText("• " + n, padding, yy);
-        yy += 18;
-      }
-
-      out.toBlob((blob) => {
-        if (!blob) return;
-        downloadBlob("speaker_report.png", blob);
-      }, "image/png");
-    }
-
-    // ---------- State ----------
-    let state = {
-      rows: [],
-      rowsRaw: [],
-      totalWords: 0,
-      ignoredCount: 0,
-      sortKey: 'words',
-      sortDir: 'desc',
-      viewerLines: [],
-      otherMembers: [],
-      activeSet: new Set(),
-      readability: null,
-      lastAnalysis: null
-    };
-
-    // ---------- Active speaker highlight ----------
-    function setActiveSpeaker(name) {
-      // If clicking Other, highlight all small speakers
-      if (name === "Other" && state.otherMembers && state.otherMembers.length) {
-        state.activeSet = new Set(state.otherMembers);
-      } else {
-        state.activeSet = new Set([name]);
-      }
-      renderViewer(state.viewerLines, state.activeSet);
-    }
-
-    function clearHighlight() {
-      state.activeSet = new Set();
-      renderViewer(state.viewerLines, state.activeSet);
-    }
-
-    // ---------- Render All ----------
-    function renderAll() {
-      const rows = sortedRows(state);
-      renderTable(state);
-      drawPie(rows);
-      drawBar(rows);
-      drawStack(rows);
-      renderLegend(rows);
-
-      renderViewer(state.viewerLines, state.activeSet);
-      renderSuggestions(state.readability);
-
-      // Summary box
-      $('summaryBox').value = buildSummary(state);
-    }
-
-    // ---------- Main Analyze ----------
-    function analyzeNow() {
-      const opts = {
-        ignoreBrackets: $('ignoreBrackets').checked,
-        caseSensitive: $('caseSensitive').checked
-      };
-
-      const parsed = parseScript($('script').value, opts);
-
-      // group small speakers into Other
-      const groupEnabled = $('groupSmall').checked;
-      const threshold = Number($('smallPct').value);
-      const grouped = applyOtherGrouping(parsed.rowsRaw, parsed.totalWords, groupEnabled, threshold);
-
-      state.rowsRaw = parsed.rowsRaw;
-      state.rows = grouped.rows;
-      state.otherMembers = grouped.otherMembers;
-
-      state.totalWords = parsed.totalWords;
-      state.ignoredCount = parsed.ignoredCount;
-      state.viewerLines = parsed.viewerLines;
-
-      // Clear any highlight if speaker no longer exists
-      state.activeSet = new Set();
-
-      // readability analysis
-      state.readability = analyzeReadability(parsed.viewerLines);
-
-      // store analysis snapshot for JSON export
-      state.lastAnalysis = {
-        generatedAt: new Date().toISOString(),
-        options: {
-          ignoreBrackets: opts.ignoreBrackets,
-          caseSensitive: opts.caseSensitive,
-          groupSmall: groupEnabled,
-          smallPct: threshold
-        },
-        totals: {
-          totalWords: state.totalWords,
-          ignoredLines: state.ignoredCount
-        },
-        rows: state.rows,
-        otherMembers: state.otherMembers,
-        readability: {
-          spokenWordsAnalyzed: state.readability.totalWords,
-          sentences: state.readability.sentences,
-          avgSentenceWords: state.readability.avgSentence,
-          longSentenceRatePct: state.readability.longPct,
-          questionMarks: state.readability.questionCount,
-          suggestions: state.readability.suggestions
+          const label = r0.name.length > 10 ? r0.name.slice(0, 9) + '…' : r0.name;
+          ctx.fillStyle = 'rgba(255,255,255,.7)';
+          ctx.fillText(label, x + barW / 2, padT + h + 16);
         }
-      };
+        ctx.textAlign = 'left';
 
-      renderAll();
-    }
+        if (rows.length > top.length) {
+          ctx.fillStyle = 'rgba(255,255,255,.55)';
+          ctx.font = '12px system-ui';
+          ctx.fillText(`Showing top ${top.length} of ${rows.length}`, padL, 14);
+        }
+      }
 
-    // ---------- Events ----------
-    (function init() {
-      // Analyze
+      function drawStack(rows) {
+        const c = $('stack');
+        const ctx = c.getContext('2d');
+        clearCanvas(ctx, c);
+
+        const pad = 14;
+        const x0 = pad;
+        const y0 = pad;
+        const w = c.width - pad * 2;
+        const h = c.height - pad * 2;
+
+        const total = rows.reduce((a, r) => a + r.words, 0);
+        if (total <= 0) return;
+
+        let x = x0;
+        for (const r0 of rows) {
+          const segW = w * (r0.words / total);
+          ctx.fillStyle = hashColor(r0.name);
+          ctx.fillRect(x, y0, segW, h);
+          x += segW;
+        }
+
+        ctx.strokeStyle = 'rgba(255,255,255,.15)';
+        ctx.strokeRect(x0, y0, w, h);
+
+        ctx.fillStyle = 'rgba(255,255,255,.65)';
+        ctx.font = '12px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillText('0%', x0, c.height - 4);
+        ctx.fillText('50%', x0 + w/2, c.height - 4);
+        ctx.fillText('100%', x0 + w, c.height - 4);
+        ctx.textAlign = 'left';
+      }
+
+      function renderAll() {
+        const rows = sortedRows();
+        renderTable();
+        drawPie(rows);
+        drawBar(rows);
+        drawStack(rows);
+        renderLegend(rows);
+      }
+
+      // ---------- Suggestions (NO template lines; only text-based signals) ----------
+      function setSuggestions(items) {
+        const ul = $('suggestionsList');
+        ul.innerHTML = '';
+        if (!items.length) {
+          const li = document.createElement('li');
+          li.textContent = 'No suggestions right now.';
+          ul.appendChild(li);
+          return;
+        }
+        for (const s of items) {
+          const li = document.createElement('li');
+          li.textContent = s;
+          ul.appendChild(li);
+        }
+      }
+
+      function generateSuggestions(rawText, parsedRows, totalWords, ignoredCount) {
+        const suggestions = [];
+        const text = (rawText || '').trim();
+        if (!text) return ['Paste a script, then click Analyze.'];
+
+        // Estimated speaking time (roughly 130–160 wpm)
+        const wpm = 145;
+        const minutes = totalWords / wpm;
+        if (totalWords > 0) {
+          if (minutes > 3.5) suggestions.push(`This is about ${minutes.toFixed(1)} minutes at a normal speaking pace. Consider trimming if you need it under ~3 minutes.`);
+          else suggestions.push(`Estimated speaking time: ~${minutes.toFixed(1)} minutes at a normal pace.`);
+        }
+
+        // Balance: biggest speaker share
+        if (parsedRows.length >= 2 && totalWords > 0) {
+          const sorted = [...parsedRows].sort((a,b)=>b.words-a.words);
+          const top = sorted[0];
+          const topPct = (top.words / totalWords) * 100;
+          if (topPct > 45) suggestions.push(`${top.name} speaks ~${topPct.toFixed(1)}% of the words. If you want it more balanced, move 1–2 sentences to other speakers.`);
+          const bottom = sorted[sorted.length - 1];
+          const bottomPct = (bottom.words / totalWords) * 100;
+          if (bottomPct < 3) suggestions.push(`${bottom.name} has a very small part (~${bottomPct.toFixed(1)}%). Consider giving them 1 extra line so every speaker feels involved.`);
+        }
+
+        // Potential name inconsistencies (same letters different spacing/case)
+        const names = parsedRows.map(r => r.name);
+        const normalized = names.map(n => n.toLowerCase().replace(/\s+/g,''));
+        const seen = new Map();
+        for (let i=0;i<names.length;i++){
+          const k = normalized[i];
+          if (!seen.has(k)) seen.set(k, [names[i]]);
+          else seen.get(k).push(names[i]);
+        }
+        for (const arr of seen.values()){
+          const uniq = [...new Set(arr)];
+          if (uniq.length >= 2) {
+            suggestions.push(`Possible name inconsistency: ${uniq.join(' vs ')}. If these are the same person, pick one spelling so counts match.`);
+          }
+        }
+
+        // Long lines (hard to speak)
+        const lines = rawText.split(/\r?\n/);
+        let longLineCount = 0;
+        for (const ln of lines) {
+          const t = ln.trim();
+          if (!t) continue;
+          if (/^\s*slide\b/i.test(t)) continue;
+          if (t.startsWith('[') || t.startsWith('(')) continue;
+          // ignore speaker name portion when measuring
+          const afterColon = t.includes(':') ? t.split(':').slice(1).join(':').trim() : t;
+          if (afterColon.length >= 160) longLineCount++;
+        }
+        if (longLineCount >= 2) suggestions.push(`You have ${longLineCount} very long lines. Consider splitting them into shorter sentences to sound more natural.`);
+        else if (longLineCount === 1) suggestions.push(`There’s 1 very long line. Splitting it into 2 lines can make delivery easier.`);
+
+        // Filler/repetition checks
+        const lower = rawText.toLowerCase();
+        const fillers = ['basically', 'um', 'uh', 'like,', 'you know', 'so,', 'so basically'];
+        const fillerHits = fillers.filter(f => lower.includes(f));
+        if (fillerHits.length) suggestions.push(`Check for filler phrases (${fillerHits.join(', ')}). Removing a few can make it sound sharper.`);
+
+        // Stage directions count
+        const bracketLines = lines.filter(l => l.trim().startsWith('[') || l.trim().startsWith('(')).length;
+        if (bracketLines > 8) suggestions.push(`You have ${bracketLines} stage-direction lines. If time is tight, keep only the ones that add clarity or fun.`);
+
+        // Ignored lines might indicate formatting issues
+        if (ignoredCount > 10) suggestions.push(`Ignored lines: ${ignoredCount}. If that seems too high, check for missing "Name:" prefixes on dialogue lines.`);
+
+        // Q/A ending
+        if (!/do you have any questions/i.test(rawText) && totalWords > 0) {
+          suggestions.push(`Consider ending with an invitation for questions (e.g., “Do you have any questions?”) so the transition to Q&A feels smooth.`);
+        }
+
+        return suggestions.slice(0, 10);
+      }
+
+      // ---------- CSV ----------
+      function toCSV(rows) {
+        const header = 'Speaker,Words,Percent';
+        const lines = rows.map(r => {
+          const safe = '"' + String(r.name).replace(/"/g, '""') + '"';
+          return `${safe},${r.words},${r.pct.toFixed(1)}`;
+        });
+        return [header, ...lines].join('\n');
+      }
+
+      function download(filename, text) {
+        const blob = new Blob([text], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      // ---------- Analyze ----------
+      function analyzeNow() {
+        const opts = {
+          ignoreBrackets: $('ignoreBrackets').checked,
+          caseSensitive: $('caseSensitive').checked
+        };
+
+        const threshold = clamp(Number($('otherThreshold').value || 0), 0, 50);
+
+        const parsed = parseScript($('script').value, opts);
+
+        // merge low-percentage speakers into Other BEFORE display
+        let merged = mergeUnderThreshold(parsed.rows, threshold);
+
+        // recompute display percentages and totals
+        const { withPct, total } = computeDisplayPct(merged);
+
+        state.rows = withPct;
+        state.totalWords = total;
+        state.ignoredCount = parsed.ignoredCount;
+
+        // Suggestions based on raw + distribution (use original parsed rows for balance signals)
+        const sugg = generateSuggestions($('script').value, parsed.rows, total, parsed.ignoredCount);
+        setSuggestions(sugg);
+
+        renderAll();
+      }
+
+      // ---------- Events ----------
       $('analyzeBtn').addEventListener('click', analyzeNow);
 
-      // Clear script
       $('clearBtn').addEventListener('click', () => {
         $('script').value = '';
+        updateViewerText();
+        syncViewerScroll();
+        setSuggestions(['Paste a script and click Analyze.']);
       });
 
-      // Reset everything
       $('resetData').addEventListener('click', () => {
-        state = {
-          rows: [],
-          rowsRaw: [],
-          totalWords: 0,
-          ignoredCount: 0,
-          sortKey: 'words',
-          sortDir: 'desc',
-          viewerLines: [],
-          otherMembers: [],
-          activeSet: new Set(),
-          readability: null,
-          lastAnalysis: null
-        };
-        $('summaryBox').value = '';
+        state = { rows: [], totalWords: 0, ignoredCount: 0, sortKey: 'words', sortDir: 'desc' };
+        $('totalWords').textContent = '0';
+        $('speakerCount').textContent = '0';
+        $('ignoredCount').textContent = '0';
+        setSuggestions(['Paste a script and click Analyze.']);
         renderAll();
       });
 
-      // Sorting
       $('sortName').addEventListener('click', () => { state.sortKey = 'name'; renderAll(); });
       $('sortWords').addEventListener('click', () => { state.sortKey = 'words'; renderAll(); });
       $('sortPct').addEventListener('click', () => { state.sortKey = 'pct'; renderAll(); });
@@ -1288,56 +810,39 @@ Aailya: Yeah, this is really hard work."></textarea>
         renderAll();
       });
 
-      // Clear highlight
-      $('clearHighlight').addEventListener('click', clearHighlight);
-
-      // Copy summary
-      $('copySummary').addEventListener('click', async () => {
-        const ok = await copyToClipboard($('summaryBox').value || '');
-        $('copySummary').textContent = ok ? 'Copied!' : 'Copy failed';
-        setTimeout(() => $('copySummary').textContent = 'Copy summary', 900);
+      $('otherThreshold').addEventListener('change', () => {
+        // if user already analyzed, re-run to regroup
+        if (($('script').value || '').trim().length > 0) analyzeNow();
       });
 
-      // CSV
       $('downloadCsv').addEventListener('click', () => {
-        const rows = sortedRows(state);
-        downloadText('speaker_percentages.csv', toCSV(rows), 'text/csv;charset=utf-8');
+        const rows = sortedRows();
+        download('speaker_percentages.csv', toCSV(rows));
       });
 
       $('copyCsv').addEventListener('click', async () => {
-        const rows = sortedRows(state);
+        const rows = sortedRows();
         const csv = toCSV(rows);
-        const ok = await copyToClipboard(csv);
-        $('copyCsv').textContent = ok ? 'Copied!' : 'Copy failed';
-        setTimeout(() => $('copyCsv').textContent = 'Copy CSV', 900);
-      });
-
-      // JSON
-      $('downloadJson').addEventListener('click', () => {
-        const payload = state.lastAnalysis || { error: "Run Analyze first." };
-        downloadText('speaker_analysis.json', JSON.stringify(payload, null, 2), 'application/json;charset=utf-8');
-      });
-
-      // PNG report
-      $('downloadPng').addEventListener('click', () => {
-        if (!state.rows || !state.rows.length) {
-          alert("Run Analyze first so there is data to export.");
-          return;
+        try {
+          await navigator.clipboard.writeText(csv);
+          $('copyCsv').textContent = 'Copied!';
+          setTimeout(() => $('copyCsv').textContent = 'Copy CSV', 900);
+        } catch {
+          const ta = document.createElement('textarea');
+          ta.value = csv;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+          $('copyCsv').textContent = 'Copied!';
+          setTimeout(() => $('copyCsv').textContent = 'Copy CSV', 900);
         }
-        exportPNGReport(state);
       });
 
-      // Re-analyze automatically if options change (nice UX)
-      ['ignoreBrackets','caseSensitive','groupSmall','smallPct'].forEach(id => {
-        $(id).addEventListener('change', () => {
-          // only auto-run if there is already text
-          if (($('script').value || '').trim().length > 0) analyzeNow();
-        });
-      });
-
-      // Initial render
+      // Initial paint
+      updateViewerText();
       renderAll();
-    })();
+    });
   </script>
 </body>
 </html>

@@ -32,9 +32,6 @@
     tr:hover td{background:rgba(124,156,255,.06)}
     .right{text-align:right}
     .nameCell{font-weight:600}
-    .warn{color:var(--warn)}
-    .good{color:var(--good)}
-    .bad{color:var(--bad)}
     .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
     .controls .left{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     input[type="text"],input[type="number"]{background:#0b1020;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:9px 10px;outline:none}
@@ -47,6 +44,7 @@
     .footer{margin-top:12px;color:var(--muted);font-size:12px}
     code{background:rgba(255,255,255,.06);padding:2px 6px;border-radius:8px}
     ul{margin:10px 0 0 18px}
+    .tag{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid rgba(36,48,83,.9);background:rgba(124,156,255,.10);color:rgba(230,232,239,.95);font-size:11px;margin-right:8px}
   </style>
 </head>
 <body>
@@ -112,7 +110,7 @@ Aailya: Yeah, this is really hard work."></textarea>
       <div class="card">
         <h2>Results table</h2>
 
-        <!-- Suggestions box (Feature #7) -->
+        <!-- Suggestions box -->
         <div id="suggestionsBox" style="margin:10px 0 12px; padding:12px; border:1px solid rgba(36,48,83,.7); border-radius:12px; background:#0b1020;">
           <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
             <div style="font-weight:700; color:#d7dcff;">Suggestions</div>
@@ -122,7 +120,7 @@ Aailya: Yeah, this is really hard work."></textarea>
             </label>
           </div>
           <div class="mini" style="margin-top:6px; color:rgba(255,255,255,.65);">
-            Tips based on speaker balance, tiny speakers, and possible name mismatches.
+            Script improvements: balance, clarity, flow, and “sounds better” tips.
           </div>
           <ul id="suggestionsList" style="margin:10px 0 0 18px; padding:0; color:rgba(230,232,239,.92);"></ul>
         </div>
@@ -175,13 +173,19 @@ Aailya: Yeah, this is really hard work."></textarea>
       const n = (name || "").trim();
       if (!n) return "";
       if (caseSensitive) return n;
-      // normalize: Capitalize first letter, keep rest as-is
       return n[0].toUpperCase() + n.slice(1);
     }
 
     function countWords(text) {
       const m = (text || "").match(/[A-Za-z0-9]+(?:'[A-Za-z0-9]+)*/g);
       return m ? m.length : 0;
+    }
+
+    function splitSentences(text) {
+      // Simple sentence split (good enough for suggestions)
+      const t = (text || "").replace(/\s+/g, ' ').trim();
+      if (!t) return [];
+      return t.split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean);
     }
 
     function hashColor(str) {
@@ -194,8 +198,12 @@ Aailya: Yeah, this is really hard work."></textarea>
       return `hsl(${hue} 70% 60%)`;
     }
 
-    function round1(x) {
-      return Math.round(x * 10) / 10;
+    function round1(x) { return Math.round(x * 10) / 10; }
+
+    function clipWords(text, n=12) {
+      const words = (text || "").trim().split(/\s+/).filter(Boolean);
+      if (words.length <= n) return words.join(' ');
+      return words.slice(0, n).join(' ') + '…';
     }
 
     // ---------- Feature: merge tiny speakers into "Other" (< 1%) ----------
@@ -207,25 +215,18 @@ Aailya: Yeah, this is really hard work."></textarea>
 
       for (const r of rows) {
         const pct = (r.words / totalWords) * 100;
-        if (pct < thresholdPct) {
-          otherWords += r.words;
-        } else {
-          kept.push({ ...r });
-        }
+        if (pct < thresholdPct) otherWords += r.words;
+        else kept.push({ ...r });
       }
 
-      if (otherWords > 0) {
-        kept.push({ name: 'Other', words: otherWords, pct: 0 });
-      }
+      if (otherWords > 0) kept.push({ name: 'Other', words: otherWords, pct: 0 });
 
-      // Recompute pct with rounding
       const updatedTotal = kept.reduce((a, r) => a + r.words, 0);
       const withPct = kept.map(r => ({
         ...r,
         pct: updatedTotal > 0 ? round1((r.words / updatedTotal) * 100) : 0
       }));
 
-      // Fix rounding drift so it totals ~100.0
       if (updatedTotal > 0) {
         const sum = withPct.reduce((a, r) => a + r.pct, 0);
         const drift = round1(100 - sum);
@@ -242,23 +243,21 @@ Aailya: Yeah, this is really hard work."></textarea>
     // ---------- Parsing ----------
     function parseScript(text, opts) {
       const lines = (text || "").split(/\r?\n/);
-      const blocks = [];
+      const blocks = []; // {name, text, lineNo}
       let current = null;
       let ignored = 0;
 
-      // Name must start with a capital letter and end with colon
       const nameLineRe = /^\s*([A-Z][A-Za-z0-9_\- ]{0,40}?)\s*:\s*(.*)\s*$/;
-      const slideLineRe = /^\s*slide\b/i; // ignore "Slide ..." lines
+      const slideLineRe = /^\s*slide\b/i;
 
-      for (const raw of lines) {
+      for (let idx = 0; idx < lines.length; idx++) {
+        const raw = lines[idx];
         const line = raw.trimEnd();
         const trimmed = line.trim();
         if (trimmed.length === 0) continue;
 
-        // Ignore slide headings
         if (slideLineRe.test(trimmed)) { ignored++; continue; }
 
-        // Ignore stage directions
         if (opts.ignoreBrackets) {
           if (trimmed.startsWith('[') || trimmed.startsWith('(')) { ignored++; continue; }
         }
@@ -267,17 +266,13 @@ Aailya: Yeah, this is really hard work."></textarea>
         if (m) {
           const nmRaw = m[1] || "";
           const nm = normalizeName(nmRaw, opts.caseSensitive);
-
-          // Safety: ignore any accidental speaker name containing "slide"
           if (/\bslide\b/i.test(nm)) { ignored++; current = null; continue; }
 
           const txt = (m[2] || "").trim();
-          current = { name: nm, text: txt };
+          current = { name: nm, text: txt, lineNo: idx + 1 };
           blocks.push(current);
         } else {
-          // Continuation line
           if (current) {
-            // Also ignore slide headings that appear as continuation lines
             if (slideLineRe.test(trimmed)) { ignored++; continue; }
             current.text = (current.text ? current.text + " " : "") + trimmed;
           } else {
@@ -304,7 +299,6 @@ Aailya: Yeah, this is really hard work."></textarea>
         pct: total > 0 ? round1((r.words / total) * 100) : 0
       }));
 
-      // Rounding drift fix
       if (total > 0) {
         const sum = rows.reduce((a, r) => a + r.pct, 0);
         const drift = round1(100 - sum);
@@ -315,13 +309,13 @@ Aailya: Yeah, this is really hard work."></textarea>
         }
       }
 
-      // Merge tiny speakers into Other (<1%)
+      // Merge tiny speakers
       rows = mergeTinyToOther(rows, total, 1.0);
 
-      return { rows, totalWords: total, ignoredCount: ignored };
+      return { rows, totalWords: total, ignoredCount: ignored, blocks };
     }
 
-    // ---------- Feature #7: Suggestions engine ----------
+    // ---------- Suggestions: "sounds better" engine ----------
     function levenshtein(a, b) {
       a = (a || "").toLowerCase();
       b = (b || "").toLowerCase();
@@ -333,106 +327,159 @@ Aailya: Yeah, this is really hard work."></textarea>
       for (let i = 1; i <= m; i++) {
         for (let j = 1; j <= n; j++) {
           const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-          dp[i][j] = Math.min(
-            dp[i - 1][j] + 1,
-            dp[i][j - 1] + 1,
-            dp[i - 1][j - 1] + cost
-          );
+          dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
         }
       }
       return dp[m][n];
     }
 
-    function renderSuggestions(rows, totalWords) {
-      const box = $('suggestionsBox');
+    function addSuggestion(listEl, tag, text) {
+      const li = document.createElement('li');
+      const t = document.createElement('span');
+      t.className = 'tag';
+      t.textContent = tag;
+      li.appendChild(t);
+      li.appendChild(document.createTextNode(text));
+      listEl.appendChild(li);
+    }
+
+    function renderSuggestions(rows, totalWords, blocks) {
       const list = $('suggestionsList');
       const enabledEl = $('enableSuggestions');
-
-      if (!box || !list) return;
-
-      const enabled = enabledEl ? enabledEl.checked : true;
       list.innerHTML = '';
 
-      if (!enabled) {
-        const li = document.createElement('li');
-        li.textContent = 'Suggestions are turned off.';
-        list.appendChild(li);
-        return;
-      }
+      const enabled = enabledEl ? enabledEl.checked : true;
+      if (!enabled) { addSuggestion(list, 'Off', 'Suggestions are turned off.'); return; }
 
       if (!rows || rows.length === 0 || totalWords <= 0) {
-        const li = document.createElement('li');
-        li.textContent = 'Paste a script and click Analyze to get suggestions.';
-        list.appendChild(li);
+        addSuggestion(list, 'Start', 'Paste a script and click Analyze to get suggestions.');
         return;
       }
 
-      // Heuristics
-      const DOMINANT_PCT = 35;   // above this is dominating
-      const LOW_PCT = 5;         // below this is low
-      const IDEAL_MAX = 30;      // good upper target
-      const IDEAL_MIN = 8;       // good lower target
-
-      const sorted = [...rows].sort((a, b) => b.pct - a.pct);
+      // 1) Balance (still helpful)
+      const nonOtherRows = rows.filter(r => r.name !== 'Other');
+      const sorted = [...rows].sort((a,b)=>b.pct-a.pct);
       const top = sorted[0];
-
-      // Dominant speaker message
-      if (top && top.pct >= DOMINANT_PCT && top.name !== 'Other') {
-        const suggestedMovePct = Math.max(0, top.pct - IDEAL_MAX);
-        const suggestedMoveWords = Math.round((suggestedMovePct / 100) * totalWords);
-        const li = document.createElement('li');
-        li.textContent = `${top.name} is speaking a lot (${top.pct.toFixed(1)}%). Consider moving about ${Math.max(10, suggestedMoveWords)} words to other speakers to balance.`;
-        list.appendChild(li);
+      if (top && top.pct >= 35 && top.name !== 'Other') {
+        const movePct = Math.max(0, top.pct - 30);
+        const moveWords = Math.max(10, Math.round((movePct/100)*totalWords));
+        addSuggestion(list, 'Balance', `${top.name} is speaking a lot (${top.pct.toFixed(1)}%). Consider moving about ${moveWords} words to other speakers for a smoother team feel.`);
       }
 
-      // Low speakers message
-      const low = rows.filter(r => r.name !== 'Other' && r.pct > 0 && r.pct < LOW_PCT);
+      // 2) Tiny speakers (excluding Other)
+      const low = nonOtherRows.filter(r => r.pct > 0 && r.pct < 5);
       if (low.length > 0) {
-        const li = document.createElement('li');
         const names = low.map(r => `${r.name} (${r.pct.toFixed(1)}%)`).join(', ');
-        li.textContent = `Some speakers are very low: ${names}. Consider giving each ~10–40 more words (or merging lines) so everyone participates.`;
-        list.appendChild(li);
+        addSuggestion(list, 'Balance', `Some speakers are very low: ${names}. Give each ~1–3 extra sentences so they feel intentional, not “cameo.”`);
       }
 
-      // Balance check: are most in an "ideal band"?
-      const nonOther = rows.filter(r => r.name !== 'Other');
-      const inBand = nonOther.filter(r => r.pct >= IDEAL_MIN && r.pct <= IDEAL_MAX);
-      if (nonOther.length >= 3) {
-        const ratio = inBand.length / nonOther.length;
-        const li = document.createElement('li');
-        if (ratio >= 0.6) {
-          li.textContent = `Nice balance: ${inBand.length}/${nonOther.length} speakers are between ${IDEAL_MIN}% and ${IDEAL_MAX}%.`;
-        } else {
-          li.textContent = `Balance tip: try to get more speakers between ${IDEAL_MIN}% and ${IDEAL_MAX}% for a more even presentation.`;
-        }
-        list.appendChild(li);
-      }
-
-      // Possible name mismatch detection (similar names)
-      const names = nonOther.map(r => r.name);
+      // 3) Name mismatch detection
+      const names = nonOtherRows.map(r => r.name);
       const pairs = [];
       for (let i = 0; i < names.length; i++) {
         for (let j = i + 1; j < names.length; j++) {
-          const a = names[i], b = names[j];
-          const d = levenshtein(a, b);
-          const maxLen = Math.max(a.length, b.length);
-          if (maxLen >= 4 && d > 0 && d <= 2) {
-            pairs.push([a, b, d]);
-          }
+          const d = levenshtein(names[i], names[j]);
+          const maxLen = Math.max(names[i].length, names[j].length);
+          if (maxLen >= 4 && d > 0 && d <= 2) pairs.push([names[i], names[j]]);
         }
       }
       if (pairs.length > 0) {
-        const li = document.createElement('li');
-        const show = pairs.slice(0, 3).map(p => `${p[0]} vs ${p[1]}`).join('; ');
-        li.textContent = `Possible name mismatches detected: ${show}. If these are the same person, make the spelling consistent.`;
-        list.appendChild(li);
+        addSuggestion(list, 'Cleanup', `Possible name mismatches: ${pairs.slice(0,3).map(p=>`${p[0]} vs ${p[1]}`).join('; ')}. Make spelling consistent so counts + delivery are clean.`);
       }
 
-      // If nothing triggered
+      // Style / “sounds better” suggestions use blocks
+      const allText = (blocks || []).map(b => b.text).join(' ').replace(/\s+/g,' ').trim();
+
+      // 4) Long sentences: find top 3 longest sentences in entire script
+      const sentences = splitSentences(allText);
+      if (sentences.length > 0) {
+        const scored = sentences.map(s => ({ s, w: countWords(s) })).sort((a,b)=>b.w-a.w);
+        const longOnes = scored.filter(x => x.w >= 28).slice(0, 3);
+        if (longOnes.length > 0) {
+          addSuggestion(list, 'Flow', `You have ${longOnes.length} very long sentence(s) (28+ words). Split them into two shorter sentences for a punchier delivery.`);
+          longOnes.forEach((x, i) => {
+            addSuggestion(list, 'Example', `Long sentence ${i+1} (${x.w} words): “${clipWords(x.s, 14)}” → try: break after a natural pause (comma/“and”).`);
+          });
+        }
+      }
+
+      // 5) Repeated openers / filler phrases at start of lines
+      const openerCounts = new Map();
+      const openerPhrases = [
+        "yeah", "so", "okay", "great job", "sounds like", "that's amazing", "interesting", "to conclude", "thank you"
+      ];
+      const blockStarts = (blocks || [])
+        .map(b => (b.text || "").trim())
+        .filter(Boolean)
+        .map(t => t.split(/\s+/).slice(0, 3).join(' ').toLowerCase());
+
+      for (const start of blockStarts) {
+        for (const p of openerPhrases) {
+          if (start.startsWith(p)) openerCounts.set(p, (openerCounts.get(p) || 0) + 1);
+        }
+      }
+      const repeatedOpeners = [...openerCounts.entries()].filter(([p,c])=>c >= 3).sort((a,b)=>b[1]-a[1]);
+      if (repeatedOpeners.length > 0) {
+        const topRep = repeatedOpeners[0];
+        addSuggestion(list, 'Variety', `A lot of lines start with “${topRep[0]}” (${topRep[1]} times). Vary openers so the script sounds less repetitive (e.g., “Here’s the key point…”, “Next…”, “What we learned was…”).`);
+      }
+
+      // 6) Too many "we" sentences in a row (monotone cadence)
+      const weStarts = sentences.filter(s => /^\s*we\b/i.test(s)).length;
+      if (sentences.length >= 6 && weStarts / sentences.length > 0.45) {
+        addSuggestion(list, 'Voice', `Many sentences start with “We…” (${weStarts}/${sentences.length}). Mix in other structures: questions, “This means…”, “The result was…”, “That’s why…”, or start with the mission/robot instead of the team.`);
+      }
+
+      // 7) Acronyms & jargon: suggest defining once
+      const acronyms = [
+        { key: "qc", pretty: "QC", expand: "Quality Control" },
+        { key: "pid", pretty: "PID", expand: "Proportional–Integral–Derivative" },
+        { key: "lidar", pretty: "LiDAR", expand: "light detection and ranging" },
+        { key: "github", pretty: "GitHub", expand: "our code collaboration site" },
+        { key: "xcode", pretty: "Xcode", expand: "Apple’s development tool" }
+      ];
+      const lowerAll = allText.toLowerCase();
+      const used = acronyms.filter(a => lowerAll.includes(a.key));
+      if (used.length > 0) {
+        const missingDefs = used.filter(a => !new RegExp(`\\b${a.pretty}\\b\\s*\\(`,'i').test(allText)); // crude: looks for "QC ("
+        if (missingDefs.length > 0) {
+          addSuggestion(list, 'Clarity', `Define acronyms the first time you say them. Example: “${missingDefs[0].pretty} (${missingDefs[0].expand})” so judges never feel lost.`);
+        }
+      }
+
+      // 8) Transition structure check: hook/problem/solution/impact/close
+      const hasProblem = /problem|danger|risk|challenge|hard|difficult/i.test(allText);
+      const hasSolution = /solution|we created|we built|our robot|our app/i.test(allText);
+      const hasImpact = /impact|inspire|mentor|worldwide|anyone|accessible|download/i.test(allText);
+      const hasClose = /to conclude|in conclusion|do you have any questions|thank you/i.test(allText);
+      if (!hasProblem || !hasSolution || !hasImpact || !hasClose) {
+        const missing = [
+          !hasProblem ? "problem" : null,
+          !hasSolution ? "solution" : null,
+          !hasImpact ? "impact" : null,
+          !hasClose ? "closing line" : null
+        ].filter(Boolean).join(", ");
+        addSuggestion(list, 'Structure', `Consider tightening your story arc. Missing or weak: ${missing}. A clean flow is: Hook → Problem → Solution → Evidence → Impact → Close.`);
+      } else {
+        addSuggestion(list, 'Structure', `Your story arc is solid (problem → solution → impact → close). To make it sound even better, add one strong “hook” sentence at the very start.`);
+      }
+
+      // 9) Quick “make it punchier” micro-suggestions based on punctuation
+      const exclamations = (allText.match(/!/g) || []).length;
+      if (exclamations >= 6) {
+        addSuggestion(list, 'Tone', `You use a lot of exclamation points (${exclamations}). Keeping only the biggest moments makes the excitement feel more real.`);
+      }
+
+      // 10) Provide a ready-to-use “hook + close” template
+      addSuggestion(
+        list,
+        'Template',
+        `Hook idea: “What if you could map a dangerous cave without stepping inside?” Close idea: “We’d love your questions—and you can try driving the robot now.”`
+      );
+
+      // If somehow nothing got added (shouldn't happen)
       if (list.children.length === 0) {
-        const li = document.createElement('li');
-        li.textContent = 'No major issues detected. Looks good!';
-        list.appendChild(li);
+        addSuggestion(list, 'OK', 'No major issues detected. Looks good!');
       }
     }
 
@@ -442,7 +489,8 @@ Aailya: Yeah, this is really hard work."></textarea>
       totalWords: 0,
       ignoredCount: 0,
       sortKey: 'words',
-      sortDir: 'desc'
+      sortDir: 'desc',
+      blocks: []
     };
 
     function sortedRows() {
@@ -648,7 +696,7 @@ Aailya: Yeah, this is really hard work."></textarea>
       drawBar(rows);
       drawStack(rows);
       renderLegend(rows);
-      renderSuggestions(state.rows, state.totalWords);
+      renderSuggestions(state.rows, state.totalWords, state.blocks);
     }
 
     // ---------- CSV ----------
@@ -673,37 +721,28 @@ Aailya: Yeah, this is really hard work."></textarea>
       URL.revokeObjectURL(url);
     }
 
-    // ---------- Events (robust: ensures button works even if script is moved) ----------
+    // ---------- Events ----------
     function wireEvents() {
-      const analyzeBtn = $('analyzeBtn');
-      const clearBtn = $('clearBtn');
-      const resetBtn = $('resetData');
+      $('analyzeBtn').addEventListener('click', () => {
+        const opts = {
+          ignoreBrackets: $('ignoreBrackets').checked,
+          mergeSame: $('mergeSame').checked,
+          caseSensitive: $('caseSensitive').checked
+        };
+        const out = parseScript($('script').value, opts);
+        state.rows = out.rows;
+        state.totalWords = out.totalWords;
+        state.ignoredCount = out.ignoredCount;
+        state.blocks = out.blocks || [];
+        renderAll();
+      });
 
-      if (analyzeBtn) {
-        analyzeBtn.addEventListener('click', () => {
-          const opts = {
-            ignoreBrackets: $('ignoreBrackets').checked,
-            mergeSame: $('mergeSame').checked,
-            caseSensitive: $('caseSensitive').checked
-          };
-          const { rows, totalWords, ignoredCount } = parseScript($('script').value, opts);
-          state.rows = rows;
-          state.totalWords = totalWords;
-          state.ignoredCount = ignoredCount;
-          renderAll();
-        });
-      }
+      $('clearBtn').addEventListener('click', () => { $('script').value = ''; });
 
-      if (clearBtn) {
-        clearBtn.addEventListener('click', () => { $('script').value = ''; });
-      }
-
-      if (resetBtn) {
-        resetBtn.addEventListener('click', () => {
-          state = { rows: [], totalWords: 0, ignoredCount: 0, sortKey: 'words', sortDir: 'desc' };
-          renderAll();
-        });
-      }
+      $('resetData').addEventListener('click', () => {
+        state = { rows: [], totalWords: 0, ignoredCount: 0, sortKey: 'words', sortDir: 'desc', blocks: [] };
+        renderAll();
+      });
 
       $('sortName').addEventListener('click', () => { state.sortKey = 'name'; renderAll(); });
       $('sortWords').addEventListener('click', () => { state.sortKey = 'words'; renderAll(); });
@@ -716,13 +755,11 @@ Aailya: Yeah, this is really hard work."></textarea>
       });
 
       $('downloadCsv').addEventListener('click', () => {
-        const rows = sortedRows();
-        download('speaker_percentages.csv', toCSV(rows));
+        download('speaker_percentages.csv', toCSV(sortedRows()));
       });
 
       $('copyCsv').addEventListener('click', async () => {
-        const rows = sortedRows();
-        const csv = toCSV(rows);
+        const csv = toCSV(sortedRows());
         try {
           await navigator.clipboard.writeText(csv);
           $('copyCsv').textContent = 'Copied!';
@@ -739,13 +776,11 @@ Aailya: Yeah, this is really hard work."></textarea>
         }
       });
 
-      const enableSug = $('enableSuggestions');
-      if (enableSug) {
-        enableSug.addEventListener('change', () => renderSuggestions(state.rows, state.totalWords));
-      }
+      $('enableSuggestions').addEventListener('change', () => {
+        renderSuggestions(state.rows, state.totalWords, state.blocks);
+      });
     }
 
-    // Make sure DOM is ready before wiring events (prevents "button does nothing" issues)
     document.addEventListener('DOMContentLoaded', () => {
       wireEvents();
       renderAll();
